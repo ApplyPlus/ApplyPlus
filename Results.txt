@@ -1,0 +1,277 @@
+Searching https://source.codeaurora.org/quic/la/kernel/msm-3.10, branch msm-3.10.
+Head commit: 58d9229922526fab93492e1b9b6ef291122f49e5
+
+269 Existing Bugs:
+Bug ID Name                                                                           CVE                 
+8      RDS DoS using IPoIB as local IP                                                CVE-2012-2372       
+99     XEN Discard IO DoS                                                             CVE-2013-2140       
+123    HID Sony out of bounds write                                                   CVE-2013-2890       
+124    HID Steelseries out of bounds write                                            CVE-2013-2891       
+131    HID Sensor memory disclosure                                                   CVE-2013-2898       
+156    Bridge multicast during KVM shutdown kernel BUG DoS                            CVE-2013-4129       
+166    NOFILE limit bypass using Unix sockets                                         CVE-2013-4312       
+170    IPv6 SCTP IPSec misconfiguration                                               CVE-2013-4350       
+212    mISDN receive memory disclosure                                                CVE-2013-7266       
+213    Appletalk receive memory disclosure                                            CVE-2013-7267       
+214    IPX receive memory disclosure                                                  CVE-2013-7268       
+215    AF netrom receive memory disclosure                                            CVE-2013-7269       
+216    AF packet receive memory disclosure                                            CVE-2013-7270       
+217    x25 receive message memory disclosure                                          CVE-2013-7271       
+218    IEEE 802154 dgram memory disclosure                                            CVE-2013-7281       
+220    Double free in fs/aio.c                                                        CVE-2013-7348       
+221    CryptoAPI arbitrary kernel module load                                         CVE-2013-7421       
+227    SCTP Null pointer DoS                                                          CVE-2014-0101       
+228    Keyring DoS                                                                    CVE-2014-0102       
+252    Athereos 9k network DoS race condition                                         CVE-2014-2672       
+253    PowerPC Transactional Memory DoS                                               CVE-2014-2673       
+255    802.11 Power-save mode DoS                                                     CVE-2014-2706       
+256    Inifiniband DoS                                                                CVE-2014-2739       
+263    S390 PTrace                                                                    CVE-2014-3534       
+264    kvm iommu DoS                                                                  CVE-2014-3601       
+266    hugetlb_entry                                                                  CVE-2014-3940       
+269    MIPS doesn't configure TIF_SECCOMP on syscall fast-path                        CVE-2014-4157       
+270    DoS in shmem                                                                   CVE-2014-4171       
+275    x86: DoS via invalid syscall                                                   CVE-2014-4508       
+277    Integer overflow in LZ4                                                        CVE-2014-4611       
+288    namespace rw remount                                                           CVE-2014-5206       
+289    namespace flag clearing                                                        CVE-2014-5207       
+294    UDF Infiniate loop or stack consumption                                        CVE-2014-6410       
+299    XFS Filesystem corruption, Kernel OOPS DoS                                     CVE-2014-7283       
+300    x86: Predictable TCP sequence numbers, port numbers                            CVE-2014-7284       
+301    Splice syscall denial of service                                               CVE-2014-7822       
+302    Namespace chroot infinite loop DoS                                             CVE-2014-7970       
+305    InfiniBand arbitrary memory access                                             CVE-2014-8159       
+307    Asynchronous IO denial of service                                              CVE-2014-8172       
+310    KVM instruction decoder for x86 NULL dereference                               CVE-2014-8480       
+311    KVM instruction decoder for x86 NULL dereference                               CVE-2014-8481       
+316    do_double_fault kernel panic dealing with stack segment                        CVE-2014-9090       
+317    Privilege escalation using IRET on 64bit x86                                   CVE-2014-9322       
+319    Missing boundary checks in MSM-VFE31 driver                                    CVE-2014-9410       
+322    Batman fragmented packets memory corruption                                    CVE-2014-9428       
+325     vDSO ASLR bypass                                                              CVE-2014-9585       
+326    CryptoAPI arbitrary kernel module load                                         CVE-2014-9644       
+328    Race condition in xattr replacement                                            CVE-2014-9710       
+330    Ability to unmount locked filesystems within a user namespace                  CVE-2014-9717       
+331    Emulation of SYSENTER for guest OS allows guest OS crash                       CVE-2015-0239       
+332    XFS data corruption                                                            CVE-2015-0274       
+333    Denial of service via crafted fallocate zero-range request                     CVE-2015-0275       
+339    Denial of service via the add_key system call                                  CVE-2015-1333       
+340    Memory leak in FUSE driver                                                     CVE-2015-1339       
+345    DoS (Kernel Panic) flushing netfilter tables                                   CVE-2015-1573       
+347    Buffer overflow in pipe                                                        CVE-2015-1805       
+351    Stack overflow in microcode header processing                                  CVE-2015-2666       
+352    DoS (Panic) on unaligned memory operands                                       CVE-2015-2672       
+353    Privilege escalation in socket subsystem                                       CVE-2015-2686       
+356    Bind-mounted filesystem into chroot or mount namespace allows access to parent.CVE-2015-2925       
+357    Race condition allows denial of service via rapid series of system calls rel...CVE-2015-3212       
+358    Escalation of privilege by triggering NMI within certain instruction window    CVE-2015-3290       
+359    Denial of service (skipped NMI) by modifying the rsp register                  CVE-2015-3291       
+361    Race condition in setuid programs                                              CVE-2015-3339       
+363    Sign error in OZWPAN driver                                                    CVE-2015-4001       
+364    Memory corruption in OZWPAN driver                                             CVE-2015-4002       
+365    Divide by zero in OZWPAN driver                                                CVE-2015-4003       
+367    VHost index error memory corruption                                            CVE-2015-4036       
+368    Integer overflow and Oops in UDF filesystem driver                             CVE-2015-4167       
+369    DoS (Deadlock) in TTY driver                                                   CVE-2015-4170       
+370    Privilege escalation via user-namespace mount connectivity                     CVE-2015-4176       
+371    DoS (Crash) via user-namespace unmounting.                                     CVE-2015-4177       
+372    Dos (Crash) via user-namespace root access during MNT_DETACH syscall           CVE-2015-4178       
+373    KVM NULL pointer dereference                                                   CVE-2015-4692       
+374    DoS in BPF JIT compiler                                                        CVE-2015-4700       
+375    Buffer overflow in virtio-net subsytem                                         CVE-2015-5156       
+376    NMI IRET fault handling privilege escalation                                   CVE-2015-5157       
+377    Denial of service in drivers/usb/serial/whiteheat.c                            CVE-2015-5257       
+378    denial of service in net/sctp/protocol.c                                       CVE-2015-5283       
+379    Guest users can cause denial of service (host OS panic) in KVM                 CVE-2015-5307       
+383    MD driver information disclosure                                               CVE-2015-5697       
+385    Integer overflow in sg_start_req allows denial of service                      CVE-2015-5707       
+386    Local denial of service via VHOST_SET_LOG_FD ioctl call                        CVE-2015-6252       
+388    Null pointer dereference in RDS                                                None                
+389    Uninitialized memory read in IPC router                                        CVE-2015-6642       
+391    Race null pointer condition in RDS connection                                  CVE-2015-6937       
+394    Divide by zero in PIT counters                                                 CVE-2015-7513       
+395    Null pointer dereference in USB Aiptek driver                                  CVE-2015-7515       
+396    Race condition in keyctl_read_key                                              CVE-2015-7550       
+397    Null pointer dereference in USB Visor driver                                   CVE-2015-7566       
+398    Uninitialized memory read in IPC                                               CVE-2015-7613       
+399    Local denial of service (Null pointer dereference) in the slhc driver          CVE-2015-7799       
+400    Kernel OOPS in garbage collection of unused keys                               CVE-2015-7872       
+401    Infoleak in vivid_fb_ioctl function                                            CVE-2015-7884       
+402    Infoleak in dgnc_mgmt_ioctl function                                           CVE-2015-7885       
+403    Race condition allows local users denial of service (incomplete fix to CVE-2...CVE-2015-7990       
+404    Memory corruption in datagram SKB handling                                     CVE-2015-8019       
+405    OS Panic in KVM caused by triggering many debug exceptions                     CVE-2015-8104       
+406    DoS (Packet Loss) caused by bad MTU                                            CVE-2015-8215       
+408    BTFS Compressed Inline Extents information disclosure                          CVE-2015-8374       
+409    DoS (BUG) instantiating negative keys                                          CVE-2015-8539       
+410    NULL pointer dereference in protocol identifiers                               CVE-2015-8543       
+412    Information disclosure in PPTP address length                                  CVE-2015-8569       
+413    Memory disclosure in Bluetooth bind                                            CVE-2015-8575       
+414    Access control bypass in overlay files                                         CVE-2015-8660       
+416    Null pointer dereference in NFS4 client                                        CVE-2015-8746       
+417    DoS (Deadlock) in SCTP                                                         CVE-2015-8767       
+418    DoS (Infanite loop) in FUSE driver                                             CVE-2015-8785       
+419    Null pointer dereference in redirect NAT                                       CVE-2015-8787       
+420    Use after free in Infiniband                                                   CVE-2015-8812       
+421    Memory corruption in USB hub                                                   CVE-2015-8816       
+422    Integer overflow in AIO                                                        CVE-2015-8830       
+424    DoS (Exception) in signal handling                                             CVE-2015-8844       
+425    DoS (Exception) in TM suspend mode                                             CVE-2015-8845       
+426    Use after free in TIOCGETD IOCTL                                               CVE-2016-0723       
+427    Reference count error in keyring                                               CVE-2016-0728       
+428    Incorrect fix to CVE-2015-1805 leads to array overrun                          CVE-2016-0774       
+429    Buffer overflow in __NR_perf_event_open syscall                                CVE-2016-0805       
+430    Double free in performance component                                           CVE-2016-0818       
+432    LIST_POISON should be offset for memory regions not in user space              CVE-2016-0821       
+433    Information disclosure in physical page mapping allows rowhammer               CVE-2016-0823       
+434    Core dumps written to arbitrary locations by core_pattern sysctl in user nam...None                
+435    Missing index check in MSM performance event manager                           CVE-2016-0843       
+436    Buffer overflow in IPA driver                                                  CVE-2016-0844       
+437    nfsd: any user can set a file's ACL over NFS and grant access to it            CVE-2016-1237       
+439    Privilege escalation using overlayFS with mount namespaces                     CVE-2016-1576       
+440    Incorrect DER handling on detection failure overrun                            CVE-2016-2053       
+441    Privilege escalation in IPC router kernel module                               CVE-2016-2059       
+442    Buffer overflow in msm_isp_axi_create_stream                                   CVE-2016-2061       
+444    Buffer overflow in MSM Thermal Driver                                          CVE-2016-2063       
+445    Buffer overread in MSM QDSP6 Audio Driver                                      CVE-2016-2064       
+446    Buffer overwrite in MSM QDSP6 Audio Driver                                     CVE-2016-2065       
+447    Buffer overflow in MSM QDSP6 Audio Driver                                      CVE-2016-2066       
+448    Memory pages mapped read-write by GPU driver                                   CVE-2016-2067       
+449    Memory corruption in MSM QDSP6 Audio Driver                                    CVE-2016-2068       
+450    Race condition in TLB handling for multi-core systems                          CVE-2016-2069       
+452    Timing side-channel in MAC implementation of EVM                               CVE-2016-2085       
+453    Information disclosure in atheros driver                                       CVE-2016-2117       
+454    DoS in 4 level page table handling in fork syscall                             CVE-2016-2143       
+455    Null pointer dereference in USB audio driver                                   CVE-2016-2184       
+456    Null pointer dereference in USB ATI Remote                                     CVE-2016-2185       
+457    Null pointer dereference in USB Powermate driver                               CVE-2016-2186       
+458    Null pointer dereference in USB GTCO driver                                    CVE-2016-2187       
+459    Null pointer dereference in USB IOWarrior driver                               CVE-2016-2188       
+460    Information disclosure in BPF                                                  CVE-2016-2383       
+461    Double free in MIDI                                                            CVE-2016-2384       
+462    Buffer overflow in MSM thermal driver                                          CVE-2016-2411       
+463    BusPM user-space pinter not verified before being dereferenced                 CVE-2016-2441       
+464    BusPM allows mapping memory to user-space without checking permissions         CVE-2016-2442       
+465    Buffer overwrite in Qualcomm Video Driver                                      CVE-2016-2465       
+466    Memory write through KGSL IOCTL                                                CVE-2016-2468       
+468    Buffer overwrite in Qualcomm Video Driver                                      CVE-2016-2489       
+469    Buffer overflow processing SMD write IOCTL                                     CVE-2016-2502       
+470    Race condition allows use after free in KGSL                                   CVE-2016-2503       
+472    Null pointer dereference in ALSA sequencer                                     CVE-2016-2543       
+473    Use after free in seq queue                                                    CVE-2016-2544       
+474    Double free in ALSA timer                                                      CVE-2016-2545       
+475    Corrupted linked list in ALSA timer due to double insert/delete                None                
+476    Race condition in ALSA                                                         CVE-2016-2546       
+477    Race condition in ALSA                                                         CVE-2016-2547       
+478    Memory corruption in ALSA timer                                                CVE-2016-2548       
+479    DoS (Deadlock) in hrtimer                                                      CVE-2016-2549       
+480    DoS (Memory Consumption) in UDS fd handling                                    CVE-2016-2550       
+481    Null pointer dereference in USB Treo driver                                    CVE-2016-2782       
+482    DoS (Memory Consumption) in pipes                                              CVE-2016-2847       
+485    Memory corruption in netfilter                                                 CVE-2016-3134       
+487    Null pointer dereference in USB MCT U232 driver                                CVE-2016-3136       
+488    Null pointer dereference in USB Cypress driver                                 CVE-2016-3137       
+489    Null pointer dereference in USB CDC ACM                                        CVE-2016-3138       
+490    Null pointer dereference in USB Wacom driver                                   CVE-2016-3139       
+491    Null pointer dereference in USB Digi port                                      CVE-2016-3140       
+492    DoS when guest OS allocates a large number of IP addresses                     CVE-2016-3156       
+493    Legacy base address not subject to ASLR                                        CVE-2016-3672       
+494    DoS in USB IMS PCU device driver                                               CVE-2016-3689       
+496    Untrusted pointer dereference in synopsis DWC3 driver DebugFS entry            CVE-2016-3813       
+497    Buffer overflow in IOCTL for msm_compr                                         CVE-2016-3866       
+498    Double free in CDC NCM                                                         CVE-2016-3951       
+499    Information disclosure in USB DevIO                                            CVE-2016-4482       
+500    Information disclosure in AF_LLC                                               CVE-2016-4485       
+501    Information disclosure in rtnetlink                                            CVE-2016-4486       
+502    Use after free in BPF                                                          CVE-2016-4557       
+503    Use after free in BPF                                                          CVE-2016-4558       
+504    Write vulnerability in InfiniBand                                              CVE-2016-4565       
+505    Write vulnerability in v4l2                                                    CVE-2016-4568       
+506    Information disclosure in ALSA timers                                          CVE-2016-4569       
+507    Information disclosure in ALSA timers                                          CVE-2016-4578       
+508    Information disclosure in X25                                                  CVE-2016-4580       
+509    Null pointer dereference in mount propagation tree                             CVE-2016-4581       
+511    Use after free in PPP                                                          CVE-2016-4805       
+512    Information disclosure in ISOFS                                                CVE-2016-4913       
+513    Null pointer dereference in TIPC                                               CVE-2016-4951       
+514    Corrupted offset allows for arbitrary decrements in compat IPT_SO_SET_REPLAC...CVE-2016-4997       
+515    Out of bounds memory access                                                    CVE-2016-4998       
+516    Information disclosure in tipc                                                 CVE-2016-5243       
+517    Information disclosure in rds                                                  CVE-2016-5244       
+519    Memory leak in airspy USB driver                                               CVE-2016-5400       
+520    DoS (Infanite loop) in PowerPC hypercall handler                               CVE-2016-5412       
+521    MITM of TCP sessions ACK rate challange                                        CVE-2016-5696       
+522    Memory corruption in MIC VOP driver                                            CVE-2016-5728       
+524    Buffer overflow in the hiddev driver                                           CVE-2016-5829       
+525    Race condition allows information disclosure in s390 driver                    CVE-2016-6130       
+526    Race condition disrupts system call auditing                                   CVE-2016-6136       
+527    Race condition out of bounds array access in chrome driver                     CVE-2016-6156       
+529    Elevation of privileges in AppArmor setprocattr function                       CVE-2016-6187       
+530    DoS in OverlayFS driver via rename syscall                                     CVE-2016-6197       
+531    DoS (crash) in OverlayFS post-rename operations                                CVE-2016-6198       
+534    Arbitrary read or write to kernel memory locations by leveraging /dev/sg deviceCVE-2016-10088      
+536    Race condition in the netlink_dump function in kernel before 4.6.3 allows lo...CVE-2016-9806       
+537    Race condition in the snd_pcm_period_elapsed function before 4.7 cause dos v...CVE-2016-9794       
+538    Denial of service causing memory corruption in sock_setsockopt by leveraging...CVE-2016-9793       
+539    Guest OS users can gain host OS privilegs or cause DOS due to KVM not restri...CVE-2016-9777       
+540    Information leak in KVM allows local users to obtain sensitive information f...CVE-2016-9756       
+542    Denial of service (memory consumption_ via crafted XFS filesystem operations   CVE-2016-9685       
+544    Denial of service in kvm                                                       CVE-2016-9588       
+546    Remote dos (out of bounds slab access) via crafted SCTP data                   CVE-2016-9555       
+547    denial of service (null pointer and panic) via crafted big_key                 CVE-2016-9313       
+549    Information leak in __get_user_asm_ex macro                                    CVE-2016-9178       
+550    Race condition in ion.c                                                        CVE-2016-9120       
+551    Local denial of service in the vfio PCI driver                                 CVE-2016-9084       
+552    Local denial of service (memory corruption) in vfio PCI driver                 CVE-2016-9083       
+555    Stack based buffer overflow in broadcom wireless driver                        CVE-2016-8658       
+556    Use after free in socket subsystem                                             CVE-2016-8655       
+557    Memory corruption in mpi-pow                                                   CVE-2016-8650       
+558    Local denial of service in kernel hash algorithms                              CVE-2016-8646       
+559    Local denial of service in TCP stack                                           CVE-2016-8645       
+560    Remote code execution via crafted fragmented packets in unusual hardware setupsCVE-2016-8633       
+562    Local denial of service when KVM enabled                                       CVE-2016-8630       
+563    Information leak in netlink sockets or local denial of service                 CVE-2016-7917       
+564    Information leak in /proc/*/environ                                            CVE-2016-7916       
+565    Information leak / denial of service in hid driver                             CVE-2016-7915       
+566    Info leak or local denial of service in kernel library function                CVE-2016-7914       
+567    Local privilege escalation or denial of service in xc2028 tuner                CVE-2016-7913       
+568    Local privilege escalation in usb                                              CVE-2016-7912       
+569    Use after free in ioprio_get system call                                       CVE-2016-7911       
+570    Use after free in block subsystem                                              CVE-2016-7910       
+571    Heap overflow in arcmsr scsi driver                                            CVE-2016-7425       
+572    Use after free in socket subsystem remote code execution                       CVE-2016-7117       
+573    Local privilege escalation in filesystem implementation                        CVE-2016-7097       
+574    Stack memory corruption when reading /proc/keys                                CVE-2016-7042       
+576    local denial of service in networking subsystem                                CVE-2016-6828       
+577    local privilege escalation in performance subsystem                            CVE-2016-6787       
+579    Null pointer dereference in infiniband driver                                  CVE-2016-6327       
+580    Bug in mount namespaces can lead to local denial of service                    CVE-2016-6213       
+581    Race condition leveraging incorrect handling of a copy-on-write feature (Dir...CVE-2016-5195       
+582    Denial of service in crafted keyctl commands                                   CVE-2016-4470       
+583    Possible arbitrary code execution in x86 kvm                                   CVE-2016-4440       
+584    Out of bounds write in usb driver                                              CVE-2016-3955       
+585    Use after free in IPV6                                                         CVE-2016-3841       
+586    Information leak in x86 kvm implementation                                     CVE-2016-3713       
+588    Null pointer dereference in memory management subsystem                        CVE-2016-3070       
+589    Local privilege escalation involving ecryptfs and the proc filesystem          CVE-2016-1583       
+590    Integer overflow in asn1 decoder                                               CVE-2016-0758       
+591    Null pointer dereference in crypto subsystem                                   CVE-2015-8970       
+592    Bypass strict page permissions on arm64                                        CVE-2015-8967       
+593    Privilege escalation in fcntl64 system calls                                   CVE-2015-8966       
+594    Info leak in tty driver                                                        CVE-2015-8964       
+595    Use after free in kernel events subsystem                                      CVE-2015-8963       
+596    Double free in sg scsi driver                                                  CVE-2015-8962       
+597    Use after free in ext4 driver                                                  CVE-2015-8961       
+598    Null pointer dereference in bluetooth rfcomm                                   CVE-2015-8956       
+599    Invalid pointer dereference in aarch64 perf events                             CVE-2015-8955       
+600    Local denial of service via overflayfs filesystem                              CVE-2015-8953       
+601    Denial of service in ext2 and ext4 filesystem                                  CVE-2015-8952       
+602    Information leak in arm64 dma mapping implementation                           CVE-2015-8950       
+604    Local privilege escalation or denial of service via crafted memory pages       CVE-2015-3288       
+606    Multiple race conditions in adsprpc driver                                     CVE-2015-0572       
+607    local denial of service in alsa subsystem                                      CVE-2014-9904       
+613    User space able to access TPIDRURW register                                    CVE-2014-9870       
+614    Memory subsystem mishandles execute-only pages on arm64                        CVE-2014-9803       
+
+Fixed Bugs: 298 (not shown)
+Bugs not Found: 19 (not shown)
