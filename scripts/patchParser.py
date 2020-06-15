@@ -1,5 +1,5 @@
 from enum import Enum
-
+import subprocess
 
 class natureOfChange(Enum):
     ADDED = 1
@@ -68,13 +68,24 @@ class PatchFile():
         """
         self.pathToFile = pathToFile
         self.patches = []
+        self.runSuccess = False
+        self.runResult = "Patch has not been run yet"
 
     def runPatch(self):
         """ 
         Returns an empty string if patch successfully runs 
         else returns the exact error message as a string
         """
-        pass
+        result = subprocess.run(["git", "apply", self.pathToFile], capture_output=True)
+        if result.returncode == 0:
+            self.runSuccess = True
+            self.runResult = "Patch ran successfully"
+        else:
+            self.runResult = result.stderr
+
+
+            
+
 
     def getPatch(self):
         """
@@ -128,3 +139,9 @@ class PatchFile():
                 patchObj.addLines(natureOfChange.CONTEXT, line)
 
         self.patches.append(patchObj)
+
+
+obj = PatchFile("patch.patch")
+obj.getPatch()
+print(obj.patches[0])
+obj.runPatch()
