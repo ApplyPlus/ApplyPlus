@@ -92,12 +92,18 @@ class PatchFile():
         self.runSuccess = False
         self.runResult = "Patch has not been run yet"
 
-    def runPatch(self):
+    def runPatch(self, reverse=False):
         """ 
         Returns an empty string if patch successfully runs 
         else returns the exact error message as a string
+
+        If revert=True arg is provided, git apply --reverse is run.
         """
-        result = subprocess.run(["git", "apply", self.pathToFile], capture_output=True)
+        if (reverse == True):
+            result = subprocess.run(["git", "apply", "--reverse", self.pathToFile], capture_output=True)
+        else:
+            result = subprocess.run(
+                ["git", "apply", self.pathToFile], capture_output=True)
         if result.returncode == 0:
             self.runSuccess = True
             self.runResult = "Patch ran successfully"
