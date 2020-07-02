@@ -1,4 +1,5 @@
 from enum import Enum
+import re
 import subprocess
 
 class natureOfChange(Enum):
@@ -21,6 +22,7 @@ class Patch():
         """
         self._fileName = filename
         self._lines = []
+        self._lineschanges = [-1,-1,-1,-1]
 
     def __str__(self):
         """
@@ -56,7 +58,16 @@ class Patch():
         """
         return self._fileName
 
+    def setLinesChanged(self, rawData):
+        pair = rawData.split("@@")[1].split(" ")[1:3]
+        self._lineschanges[0] = int(pair[0].split(",")[0])
+        self._lineschanges[1] = int(pair[0].split(",")[1])
+        self._lineschanges[2] = int(pair[1].split(",")[0])
+        self._lineschanges[3] = int(pair[1].split(",")[1])
+        return
 
+    def getLinesChanges(self):
+        return self._lineschanges
 class PatchFile():
     def __init__(self, pathToFile=""):
         """
@@ -118,14 +129,19 @@ class PatchFile():
                 patchObj = Patch(filename)
 
             elif line[0:2] == '@@':
-                contextline = line[2:].split(' @@ ')[-1]
+                patchObj.setLinesChanged(line)
+                if line[-2:] == "@@":
+                    # To handle cases where the line number
+                    #  is the only information available in that line
+                    pass
+                else:
+                    contextline = line[2:].split(' @@ ')[-1]
+                    if len(patchObj.getLines()) != 0:
+                        filename = patchObj.getFileName()
+                        self.patches.append(patchObj)
+                        patchObj = Patch(filename)
 
-                if len(patchObj.getLines()) != 0:
-                    filename = patchObj.getFileName()
-                    self.patches.append(patchObj)
-                    patchObj = Patch(filename)
-
-                patchObj.addLines(natureOfChange.CONTEXT, contextline, )
+                    patchObj.addLines(natureOfChange.CONTEXT, contextline, )
 
             elif line[0] == "-":
                 contextline = line[1:]
@@ -141,7 +157,3 @@ class PatchFile():
         self.patches.append(patchObj)
 
 
-obj = PatchFile("patch.patch")
-obj.getPatch()
-print(obj.patches[0])
-obj.runPatch()
