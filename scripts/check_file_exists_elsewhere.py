@@ -13,12 +13,11 @@ def checkFileExistsElsewhere(patch):
     NOTE: This method assumes the patch has failed and we are looking for solutions
     To do: Ask user if we should apply to the moved file
     """
-    
+
     toFind = patch.getFileName().split('/')[-1]
     currentdir = os.getcwd()
     for subdir, dirs, files in os.walk(currentdir):
         for file in files:
-            print(os.path.join(file))
             if (file == toFind):
                 print("File with the same as {} name found: at {}".format(toFind,
                     os.path.join(subdir, file)))

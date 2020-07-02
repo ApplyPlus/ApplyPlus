@@ -141,7 +141,3 @@ class PatchFile():
         self.patches.append(patchObj)
 
 
-obj = PatchFile("patch.patch")
-obj.getPatch()
-print(obj.patches[0])
-obj.runPatch()
