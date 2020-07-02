@@ -19,10 +19,11 @@ class Patch():
         _lines is a list of tuples of the format-
         [(<nature_of_change>, <change>),(<nature_of_change>, <change>),...,]
         Nature of Change can be one of the enums defined in natureOfChange (ADDED, REMOVED, CONTEXT)
+        _lineschanged stores the lines changed info for a patch. ie- The data found between @@s
         """
         self._fileName = filename
         self._lines = []
-        self._lineschanges = [-1,-1,-1,-1]
+        self._lineschanged = [-1,-1,-1,-1]
 
     def __str__(self):
         """
@@ -59,15 +60,24 @@ class Patch():
         return self._fileName
 
     def setLinesChanged(self, rawData):
+        """
+        Method used to add lines changed info for a patch
+        """
         pair = rawData.split("@@")[1].split(" ")[1:3]
-        self._lineschanges[0] = int(pair[0].split(",")[0])
-        self._lineschanges[1] = int(pair[0].split(",")[1])
-        self._lineschanges[2] = int(pair[1].split(",")[0])
-        self._lineschanges[3] = int(pair[1].split(",")[1])
+        self._lineschanged[0] = int(pair[0].split(",")[0])
+        self._lineschanged[1] = int(pair[0].split(",")[1])
+        self._lineschanged[2] = int(pair[1].split(",")[0])
+        self._lineschanged[3] = int(pair[1].split(",")[1])
         return
 
-    def getLinesChanges(self):
-        return self._lineschanges
+    def getLinesChanged(self):
+        """ 
+        Access the lines changed info for a patch
+        return: A list of length 4.
+        Eg: For @@ -20,7 +20,6 @@, 
+        this method returns [-20, 7, 20, 6]
+        """
+        return self._lineschanged
 class PatchFile():
     def __init__(self, pathToFile=""):
         """
