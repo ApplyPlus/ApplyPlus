@@ -78,6 +78,24 @@ class Patch():
         this method returns [-20, 7, 20, 6]
         """
         return self._lineschanged
+
+    def canApply(self, applyTo):
+        orgPatch = open(applyTo).readlines()
+        for newline in self._lines:
+            found = False;
+            if (newline[1] != natureOfChange.ADDED):
+                for sourceLine in orgPatch:
+                    if(newline[1]==sourceLine):
+                        found == True
+                if found == False:
+                    return False
+        return True
+    
+    def Apply(self, applyTo):
+        if (self.canApply(applyTo)):
+            
+        
+
 class PatchFile():
     def __init__(self, pathToFile=""):
         """
