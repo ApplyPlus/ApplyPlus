@@ -1,5 +1,6 @@
 from enum import Enum
-
+import re
+import subprocess
 
 class natureOfChange(Enum):
     ADDED = 1
@@ -18,9 +19,11 @@ class Patch():
         _lines is a list of tuples of the format-
         [(<nature_of_change>, <change>),(<nature_of_change>, <change>),...,]
         Nature of Change can be one of the enums defined in natureOfChange (ADDED, REMOVED, CONTEXT)
+        _lineschanged stores the lines changed info for a patch. ie- The data found between @@s
         """
         self._fileName = filename
         self._lines = []
+        self._lineschanged = [-1,-1,-1,-1]
 
     def __str__(self):
         """
@@ -56,7 +59,25 @@ class Patch():
         """
         return self._fileName
 
+    def setLinesChanged(self, rawData):
+        """
+        Method used to add lines changed info for a patch
+        """
+        pair = rawData.split("@@")[1].split(" ")[1:3]
+        self._lineschanged[0] = int(pair[0].split(",")[0])
+        self._lineschanged[1] = int(pair[0].split(",")[1])
+        self._lineschanged[2] = int(pair[1].split(",")[0])
+        self._lineschanged[3] = int(pair[1].split(",")[1])
+        return
 
+    def getLinesChanged(self):
+        """ 
+        Access the lines changed info for a patch
+        return: A list of length 4.
+        Eg: For @@ -20,7 +20,6 @@, 
+        this method returns [-20, 7, 20, 6]
+        """
+        return self._lineschanged
 class PatchFile():
     def __init__(self, pathToFile=""):
         """
@@ -68,13 +89,30 @@ class PatchFile():
         """
         self.pathToFile = pathToFile
         self.patches = []
+        self.runSuccess = False
+        self.runResult = "Patch has not been run yet"
 
-    def runPatch(self):
+    def runPatch(self, reverse=False):
         """ 
         Returns an empty string if patch successfully runs 
         else returns the exact error message as a string
+
+        If revert=True arg is provided, git apply --reverse is run.
         """
-        pass
+        if (reverse == True):
+            result = subprocess.run(["git", "apply", "--reverse", self.pathToFile], capture_output=True)
+        else:
+            result = subprocess.run(
+                ["git", "apply", self.pathToFile], capture_output=True)
+        if result.returncode == 0:
+            self.runSuccess = True
+            self.runResult = "Patch ran successfully"
+        else:
+            self.runResult = result.stderr
+
+
+            
+
 
     def getPatch(self):
         """
@@ -107,14 +145,19 @@ class PatchFile():
                 patchObj = Patch(filename)
 
             elif line[0:2] == '@@':
-                contextline = line[2:].split(' @@ ')[-1]
+                patchObj.setLinesChanged(line)
+                if line[-2:] == "@@":
+                    # To handle cases where the line number
+                    #  is the only information available in that line
+                    pass
+                else:
+                    contextline = line[2:].split(' @@ ')[-1]
+                    if len(patchObj.getLines()) != 0:
+                        filename = patchObj.getFileName()
+                        self.patches.append(patchObj)
+                        patchObj = Patch(filename)
 
-                if len(patchObj.getLines()) != 0:
-                    filename = patchObj.getFileName()
-                    self.patches.append(patchObj)
-                    patchObj = Patch(filename)
-
-                patchObj.addLines(natureOfChange.CONTEXT, contextline, )
+                    patchObj.addLines(natureOfChange.CONTEXT, contextline, )
 
             elif line[0] == "-":
                 contextline = line[1:]
@@ -128,3 +171,5 @@ class PatchFile():
                 patchObj.addLines(natureOfChange.CONTEXT, line)
 
         self.patches.append(patchObj)
+
+
