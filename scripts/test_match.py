@@ -153,8 +153,6 @@ def get_file_with_patch(patch_lines):
         if line[0] != parse.natureOfChange.REMOVED:
             search_lines.append(line)
     
-    # TODO: Remove this once context lines do not contain patch information
-    search_lines = search_lines[1:]
     return search_lines
 
 def get_file_without_patch_patch(patch_lines):
@@ -163,14 +161,12 @@ def get_file_without_patch_patch(patch_lines):
         if line[0] != parse.natureOfChange.ADDED:
             search_lines.append(line)
     
-    # TODO: Remove this once context lines do not contain patch information
-    search_lines = search_lines[1:]
     return search_lines
 
 # Returns an object containing information about the difference between a file and a patch
-def find_diffs(patch_lines, file_name, try_already_applied = False, retry_obj=None):
-    # TODO: Get this automatically
-    line_number = 36 
+def find_diffs(patch_obj, file_name, try_already_applied = False, retry_obj=None):
+    patch_lines = patch_obj._lines
+    line_number = patch_obj._lineschanged[2]
     
     if try_already_applied:
         search_lines_with_type = get_file_with_patch(patch_lines)
@@ -246,7 +242,7 @@ def find_diffs(patch_lines, file_name, try_already_applied = False, retry_obj=No
 # Testing
 # patch_file = parse.PatchFile("../patches/CVE-2014-8172.patch")
 # patch_file.getPatch()
-# diff_obj = find_diffs(patch_file.patches[0]._lines, "../../msm-3.10/fs/file_table.c", 
+# diff_obj = find_diffs(patch_file.patches[0], "../../msm-3.10/fs/file_table.c", 
 #     try_already_applied=True, retry_obj=Retry(2,100))
 # print(diff_obj.match_status)
 # print(diff_obj.removed_diffs)
