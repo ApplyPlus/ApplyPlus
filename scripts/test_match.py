@@ -5,7 +5,7 @@ import Levenshtein
 from pygments.lexers import CLexer, CppLexer, CSharpLexer, JavaLexer, get_lexer_for_filename
 
 dmp = dmp_module.diff_match_patch()
-dmp.Match_Distance = 2000
+dmp.Match_Distance = 3000
 LEVENSHTEIN_RATIO = 0.8
 
 """
@@ -118,9 +118,8 @@ def fuzzy_search(search_lines, file_name, patch_line_number, retry_obj=None):
 
         if patch_line_number in line_to_char_dict:
             search_location = line_to_char_dict[patch_line_number]
-        # The case that the line number in the patch file is no longer valid, let's just search from middle for now
         else:
-            search_location = cur_char//2
+            search_location = cur_char
 
     file_str = "".join(file_lines)
 
@@ -143,7 +142,7 @@ def fuzzy_search(search_lines, file_name, patch_line_number, retry_obj=None):
                    break 
 
     if char_match_loc != -1:
-        return file_str[:char_match_loc].count("\n") + 1
+        return file_str[:char_match_loc+1].count("\n") + 1
     else:
         return -1
 
@@ -155,7 +154,7 @@ def get_file_with_patch(patch_lines):
     
     return search_lines
 
-def get_file_without_patch_patch(patch_lines):
+def get_file_without_patch(patch_lines):
     search_lines = []
     for line in patch_lines:
         if line[0] != parse.natureOfChange.ADDED:
@@ -171,9 +170,11 @@ def find_diffs(patch_obj, file_name, try_already_applied = False, retry_obj=None
     if try_already_applied:
         search_lines_with_type = get_file_with_patch(patch_lines)
     else:
-        search_lines_with_type = get_file_without_patch_patch(patch_lines)
+        search_lines_with_type = get_file_without_patch(patch_lines)
     
     search_lines_without_type = [line[1] for line in search_lines_with_type]
+    
+    # TODO: When searching for lines, remove blank context lines above and below
     match_start_line = fuzzy_search(search_lines_without_type, file_name, line_number, retry_obj)
 
     if match_start_line == -1:
