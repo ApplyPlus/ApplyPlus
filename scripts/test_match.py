@@ -44,7 +44,8 @@ class Diff():
                 self.diff_tokens = diff_tokens
 
         def __init__(self, patch_line, file_line="", is_missing=True, plaintext_diff = [], 
-            language_specific_diff = LanguageSpecificDiff(), match_ratio=-1):
+            language_specific_diff = LanguageSpecificDiff(), match_ratio=-1,
+            function_for_patch="", file_line_number=-1):
 
             self.patch_line = patch_line
             self.file_line = file_line
@@ -52,17 +53,20 @@ class Diff():
             self.plaintext_diff = plaintext_diff
             self.language_specific_diff = language_specific_diff
             self.match_ratio = match_ratio
+            self.function_for_patch = function_for_patch
+            self.file_line_number = file_line_number 
 
     class MatchStatus(Enum):
         NO_MATCH = 0
         MATCH_FOUND = 1
 
-    def __init__(self, match_status, removed_diffs = [], added_diffs = [], context_diffs = [], additional_lines = []):
+    def __init__(self, match_status, removed_diffs = [], added_diffs = [], context_diffs = [], additional_lines = [], function_for_patch=""):
         self.match_status = match_status
         self.removed_diffs = removed_diffs
         self.added_diffs = added_diffs
         self.context_diffs = context_diffs
         self.additional_lines = additional_lines
+        self.function_for_patch = function_for_patch
 
 """
 See docs for output format:
@@ -165,7 +169,7 @@ def get_file_without_patch_patch(patch_lines):
 
 # Returns an object containing information about the difference between a file and a patch
 def find_diffs(patch_obj, file_name, try_already_applied = False, retry_obj=None):
-    patch_lines = patch_obj._lines
+    function_for_patch, patch_lines = patch_obj._lines[0][1], patch_obj._lines[1:]
     line_number = patch_obj._lineschanged[2]
     
     if try_already_applied:
@@ -193,7 +197,7 @@ def find_diffs(patch_obj, file_name, try_already_applied = False, retry_obj=None
     }
 
     matched_file_lines = set()
-    for patch_line in search_lines_with_type:
+    for idx, patch_line in enumerate(search_lines_with_type):
         stripped_patch_line = patch_line[1].strip()
         max_ratio = 0
         max_ratio_file_line = ""
@@ -216,10 +220,12 @@ def find_diffs(patch_obj, file_name, try_already_applied = False, retry_obj=None
             line_diff_obj = Diff.LineDiff(
                 patch_line = stripped_patch_line,
                 file_line = max_ratio_file_line,
+                file_line_number = match_start_line + idx + 1,
                 is_missing = False,
                 plaintext_diff = plaintext_diff,
                 language_specific_diff=language_specific_diff,
                 match_ratio = max_ratio,
+                function_for_patch = function_for_patch,
             )
             patch_line_type_to_list[patch_line[0]].append(line_diff_obj)
         else:
@@ -236,7 +242,8 @@ def find_diffs(patch_obj, file_name, try_already_applied = False, retry_obj=None
         removed_diffs=removed_diffs,
         added_diffs=added_diffs,
         context_diffs=context_diffs,
-        additional_lines=additional_lines
+        additional_lines=additional_lines,
+        function_for_patch=function_for_patch
     )
 
 # Testing
@@ -250,4 +257,6 @@ def find_diffs(patch_obj, file_name, try_already_applied = False, retry_obj=None
 # print(diff_obj.context_diffs)
 # print(diff_obj.additional_lines)
 # for x in diff_obj.context_diffs:
-#     print(x.language_specific_diff.diff_tokens)
+#     print(x.function_for_patch)
+#     print(x.file_line_number)
+#     print(x.file_line)
