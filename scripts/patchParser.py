@@ -3,8 +3,6 @@ import re
 import subprocess
 
 
-def to_raw(string):
-    return fr"{string}"
 class natureOfChange(Enum):
     ADDED = 1
     REMOVED = -1
@@ -241,10 +239,4 @@ class PatchFile():
         self.patches.append(patchObj)
 
 
-obj = PatchFile("./patch.patch")
-obj.getPatch()
-bj2 = obj.patches[0]
-print(bj2)
-print(bj2.canApply("arp_tables.c"))
-print(bj2.Apply("arp_tables.c"))
 
