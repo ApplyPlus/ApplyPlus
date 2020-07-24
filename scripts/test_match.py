@@ -181,7 +181,7 @@ def find_diffs(patch_obj, file_name, try_already_applied = False, retry_obj=None
     match_start_line = fuzzy_search(search_lines_without_type, file_name, line_number, retry_obj)
 
     if match_start_line == -1:
-        return Diff(PatchVsFileDiff.MatchStatus.NO_MATCH)
+        return Diff(Diff.MatchStatus.NO_MATCH)
     
     with open(file_name) as f:
         file_lines = f.readlines()[match_start_line-1:match_start_line-1 + len(search_lines_with_type) + PATCH_LENGTH_BUFFER]

@@ -36,30 +36,35 @@ class SliceParser:
             slice_dict = {}
 
             for line in str_out.splitlines():
-                file_data = re.split(",\s*(?![^{}]*\})", line)
-
-                slice_dict[file_data[1]] = {}
-            
-                slice_dict[file_data[1]][file_data[2]] = []
                 
-                slice_dict[file_data[1]][file_data[2]].append(file_data[0])
-                slice_dict[file_data[1]][file_data[2]].append(file_data[1])
-                slice_dict[file_data[1]][file_data[2]].append(file_data[2])
-                slice_dict[file_data[1]][file_data[2]].append((
-                    file_data[3].split("{", 1)[1].split("}")[0]
-                ))
-                slice_dict[file_data[1]][file_data[2]].append((
-                    file_data[4].split("{", 1)[1].split("}")[0]
-                ))
-                slice_dict[file_data[1]][file_data[2]].append((
-                    file_data[5].split("{", 1)[1].split("}")[0]
-                ))
-                slice_dict[file_data[1]][file_data[2]].append((
-                    file_data[6].split("{", 1)[1].split("}")[0]
-                ))
-                slice_dict[file_data[1]][file_data[2]].append((
-                    file_data[7].split("{", 1)[1].rsplit("}", 1)[0]
-                ))
+                # TODO: observe issue that arrises for patch CVE-2014-9710
+                
+                file_data = re.split(",\s*(?![^{}]*\})", line)
+                if len(file_data) == 8:
+
+                    slice_dict[file_data[1]] = {}
+                
+                    slice_dict[file_data[1]][file_data[2]] = []
+                    
+                    slice_dict[file_data[1]][file_data[2]].append(file_data[0])
+                    slice_dict[file_data[1]][file_data[2]].append(file_data[1])
+                    slice_dict[file_data[1]][file_data[2]].append(file_data[2])
+                    
+                    slice_dict[file_data[1]][file_data[2]].append((
+                        file_data[3].split("{", 1)[1].split("}")[0]
+                    ))
+                    slice_dict[file_data[1]][file_data[2]].append((
+                        file_data[4].split("{", 1)[1].split("}")[0]
+                    ))
+                    slice_dict[file_data[1]][file_data[2]].append((
+                        file_data[5].split("{", 1)[1].split("}")[0]
+                    ))
+                    slice_dict[file_data[1]][file_data[2]].append((
+                        file_data[6].split("{", 1)[1].split("}")[0]
+                    ))
+                    slice_dict[file_data[1]][file_data[2]].append((
+                        file_data[7].split("{", 1)[1].rsplit("}", 1)[0]
+                    ))
 
             return slice_dict
 
