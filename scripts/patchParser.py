@@ -145,7 +145,6 @@ class PatchFile():
                 patchObj = Patch(filename)
 
             elif line[0:2] == '@@':
-                patchObj.setLinesChanged(line)
                 if line[-2:] == "@@":
                     # To handle cases where the line number
                     #  is the only information available in that line
@@ -156,6 +155,9 @@ class PatchFile():
                         filename = patchObj.getFileName()
                         self.patches.append(patchObj)
                         patchObj = Patch(filename)
+                        patchObj.setLinesChanged(line)
+                    else:
+                        patchObj.setLinesChanged(line)
 
                     patchObj.addLines(natureOfChange.CONTEXT, contextline, )
 
