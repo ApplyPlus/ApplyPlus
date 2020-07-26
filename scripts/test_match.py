@@ -5,7 +5,6 @@ import Levenshtein
 from pygments.lexers import CLexer, CppLexer, CSharpLexer, JavaLexer, get_lexer_for_filename
 
 dmp = dmp_module.diff_match_patch()
-dmp.Match_Distance = 3000
 LEVENSHTEIN_RATIO = 0.8
 
 """
@@ -167,18 +166,20 @@ def get_file_without_patch(patch_lines):
     return search_lines
 
 # Returns an object containing information about the difference between a file and a patch
-def find_diffs(patch_obj, file_name, try_already_applied = False, retry_obj=None):
+def find_diffs(patch_obj, file_name, retry_obj=None, match_distance=3000):
+    dmp.Match_Distance = match_distance 
     function_for_patch, patch_lines = patch_obj._lines[0][1], patch_obj._lines[1:]
-    line_number = patch_obj._lineschanged[2]
-    
-    if try_already_applied:
-        search_lines_with_type = get_file_with_patch(patch_lines)
-    else:
-        search_lines_with_type = get_file_without_patch(patch_lines)
-    
+    line_number = patch_obj._lineschanged[2] 
+
+    search_lines_with_type = get_file_with_patch(patch_lines)
     search_lines_without_type = [line[1] for line in search_lines_with_type]
     match_start_line = fuzzy_search(search_lines_without_type, file_name, line_number, retry_obj)
 
+    if match_start_line == -1:
+        search_lines_with_type = get_file_without_patch(patch_lines)
+        search_lines_without_type = [line[1] for line in search_lines_with_type]
+        match_start_line = fuzzy_search(search_lines_without_type, file_name, line_number, retry_obj)
+    
     if match_start_line == -1:
         return Diff(Diff.MatchStatus.NO_MATCH)
     
@@ -246,11 +247,10 @@ def find_diffs(patch_obj, file_name, try_already_applied = False, retry_obj=None
     )
 
 # Testing
-# patch_file = parse.PatchFile("../patches/CVE-2014-8172.patch")
+# patch_file = parse.PatchFile("../patches/CVE-2014-9322.patch")
 # patch_file.getPatch()
-# diff_obj = find_diffs(patch_file.patches[7], "../../msm-3.10/fs/open.c", 
-#     try_already_applied=True)
-# print(diff_obj.match_status)
+# diff_obj = find_diffs(patch_file.patches[0], "../../msm-3.10/arch/x86/include/asm/page_32_types.h",
+#     retry_obj=Retry(2,100), match_distance=3000)
 # print(diff_obj.match_status)
 # print(diff_obj.removed_diffs)
 # print(diff_obj.added_diffs)
