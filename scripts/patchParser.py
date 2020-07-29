@@ -2,6 +2,7 @@ from enum import Enum
 import re
 import subprocess
 
+
 class natureOfChange(Enum):
     ADDED = 1
     REMOVED = -1
@@ -78,6 +79,75 @@ class Patch():
         this method returns [-20, 7, 20, 6]
         """
         return self._lineschanged
+
+    def canApply(self, applyTo):
+        """
+        Returns True if this patch can be applied, false otherwise
+        """
+        orgPatch = open(applyTo).readlines()
+        orgPatch = [s.replace("\n", "").encode(
+            'ascii').decode('unicode_escape') for s in orgPatch]
+        for checkLines in range(len(orgPatch)):
+            # Check if first line of patch exists
+
+            if (orgPatch[checkLines] == to_raw(self._lines[0][1])):
+
+                for ite in range(1, len(self._lines)):
+                    if (orgPatch[checkLines+ite] != self._lines[ite][1]):
+                        break
+                    return True
+        return False
+
+
+    def Apply(self, applyTo):
+        """
+        If patch can be applied, this method
+        applies it. 
+        """
+        if self.canApply(applyTo):
+            orgPatch = open(applyTo).readlines()
+            orgPatch = [s.replace("\n", "").encode(
+                'ascii').decode('unicode_escape') for s in orgPatch]
+            for checkLines in range(len(orgPatch)):
+                # Check if first line of patch exists
+                if (orgPatch[checkLines] == self._lines[0][1]):
+                    for ite in range(1, len(self._lines)):
+                        if (orgPatch[checkLines+ite] != self._lines[ite][1]):
+                            break
+                    #If the next line runs, we know the patch is applied here
+                    ite2 = 0
+                    ite3 = 0
+                    goal = len(self._lines)
+                    while(ite2 < goal and ite3 < len(self._lines)):
+                        
+                        if(self._lines[ite3][0] == natureOfChange.REMOVED):
+                            goal -= 1
+                            print(self._lines[ite3][1])
+                            orgPatch.remove(self._lines[ite3][1])
+                            ite3 += 1
+                            continue
+                        if(self._lines[ite3][0] == natureOfChange.ADDED):
+                            
+                            ite2 += 1
+                            orgPatch.insert(
+                                checkLines+ite2, self._lines[ite3][1])
+                            ite3 += 1
+                            continue
+                        if(self._lines[ite3][0] == natureOfChange.CONTEXT):
+                            ite2 += 1
+                            ite3 += 1
+                            continue
+                    writeobj = open(applyTo, "w")
+                    for i in orgPatch:
+                        writeobj.write(i+"\n")
+                    writeobj.close()
+                    return True
+
+        return False
+            
+            
+        
+
 class PatchFile():
     def __init__(self, pathToFile=""):
         """
@@ -109,10 +179,6 @@ class PatchFile():
             self.runResult = "Patch ran successfully"
         else:
             self.runResult = result.stderr
-
-
-            
-
 
     def getPatch(self):
         """
@@ -173,5 +239,6 @@ class PatchFile():
                 patchObj.addLines(natureOfChange.CONTEXT, line)
 
         self.patches.append(patchObj)
+
 
 
