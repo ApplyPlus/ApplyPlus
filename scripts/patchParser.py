@@ -80,6 +80,9 @@ class Patch():
         """
         return self._lineschanged
 
+    def _to_raw(self, string):
+        """ Private helper method to return raw string"""
+        return fr"{string}"
     def canApply(self, applyTo):
         """
         Returns True if this patch can be applied, false otherwise
@@ -90,7 +93,7 @@ class Patch():
         for checkLines in range(len(orgPatch)):
             # Check if first line of patch exists
 
-            if (orgPatch[checkLines] == to_raw(self._lines[0][1])):
+            if (orgPatch[checkLines] == self._to_raw(self._lines[0][1])):
 
                 for ite in range(1, len(self._lines)):
                     if (orgPatch[checkLines+ite] != self._lines[ite][1]):
