@@ -129,7 +129,7 @@ class Patch():
                             if(self._lines[ite3][0] == natureOfChange.REMOVED):
                                 goal -= 1
                                 for ll in orgPatch:
-                                    if(ll.strip() == self._lines[ite3][1]):
+                                    if(ll.strip() == self._lines[ite3][1].strip()):
                                         orgPatch.remove(ll)
                                 # orgPatch.remove(self._lines[ite3][1].strip())
                                 ite3 += 1
@@ -147,6 +147,7 @@ class Patch():
                                 continue
                         writeobj = open(applyTo, "w")
                         for i in orgPatch:
+                            i= i.replace('\n', '\\n')
                             writeobj.write(i+"\n")
                         writeobj.close()
                         return True
