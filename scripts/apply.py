@@ -65,8 +65,9 @@ def apply(pathToPatch):
                 if fileName in does_not_apply:
                     subpatch_name =  ":".join([fileName, str(-patch._lineschanged[0])])
                     
+                    # TODO: Change this to apply patch instead of just checking if we can
                     # Try applying the subpatch as normal
-                    subpatch_run_success = patch.Apply(fileName)
+                    subpatch_run_success = patch.canApply(fileName)
                     if subpatch_run_success:
                         successful_subpatches.append(subpatch_name)
                     else:
@@ -76,8 +77,9 @@ def apply(pathToPatch):
                         if diff_obj.match_status == tm.Diff.MatchStatus.MATCH_FOUND:
                             added_line_count = 0
                             removed_line_count = 0
+                            patch_lines = patch.getLines()
 
-                            for line in patch.getLines():
+                            for line in patch_lines:
                                 if line[0] == parse.natureOfChange.ADDED:
                                     added_line_count += 1
                                 elif line[0] == parse.natureOfChange.REMOVED:
@@ -95,9 +97,55 @@ def apply(pathToPatch):
                                 if are_context_changes_important(diff_obj):
                                     failed_subpatches_with_matched_code.append((applied_percentage, subpatch_name, diff_obj.match_start_line))
                                     
-                                # We can apply the patch, context changes are not important
+                                # We try to apply the patch, context changes are not important
+                                # However, in our case below, we still check to see if added/removed lines either must be not applied at all or applied completely
                                 else:
-                                    print(subpatch_name)
+                                    new_patch_lines = [patch_lines[0]]
+                                    context_diff_index = 0
+                                    added_diff_index = 0
+                                    removed_diff_index = 0
+                                    set_new_patch_lines = True
+                                    for line in patch_lines[1:]:
+                                        if line[0] == parse.natureOfChange.CONTEXT:
+                                            if context_diff_index < len(diff_obj.context_diffs) and diff_obj.context_diffs[context_diff_index].patch_line.strip() == line[1].strip():
+                                                if diff_obj.context_diffs[context_diff_index].is_missing:
+                                                    context_diff_index += 1
+                                                    continue
+                                                new_context_line = diff_obj.context_diffs[context_diff_index].file_line
+                                                new_patch_lines.append((parse.natureOfChange.CONTEXT, new_context_line))
+                                                context_diff_index += 1
+                                            else:
+                                                new_patch_lines.append(line)
+                                        elif line[0] == parse.natureOfChange.ADDED:
+                                            if added_diff_index < len(diff_obj.added_diffs) and diff_obj.added_diffs[added_diff_index].patch_line.strip() == line[1].strip():
+                                                if diff_obj.added_diffs[added_diff_index].is_missing:
+                                                    new_patch_lines.append(line)
+                                                else:
+                                                    set_new_patch_lines = False
+                                                    break
+                                            else:
+                                                new_patch_lines.append((parse.natureOfChange.CONTEXT, line[1]))
+                                        elif line[0] == parse.natureOfChange.REMOVED:
+                                            if removed_diff_index < len(diff_obj.removed_diffs) and diff_obj.removed_diffs[removed_diff_index].patch_line.strip() == line[1].strip():
+                                                if diff_obj.removed_diffs[removed_diff_index].patch_line.strip() == diff_obj.removed_diffs[removed_diff_index].file_line.strip():
+                                                    new_patch_lines.append(line)
+                                                else:
+                                                    set_new_patch_lines = False
+                                                    break
+
+                                    if set_new_patch_lines:
+                                        old_patch_lines = patch._lines
+                                        patch._lines = new_patch_lines
+                                        # TODO: Make this apply the change
+                                        if patch.canApply(fileName):
+                                            successful_subpatches.append(subpatch_name)
+                                        else:
+                                            # TODO: Sometimes, moving lines causes an issue, will have to think of a fix that doesn't break a ton of cases
+                                            print("Issue with current assumption in terms of what patches can be applied")
+                                            print(patch)
+                                            failed_subpatches_with_matched_code.append((applied_percentage, subpatch_name, diff_obj.match_start_line))
+                                    else:
+                                        failed_subpatches_with_matched_code.append((applied_percentage, subpatch_name, diff_obj.match_start_line))
 
                             else:
                                 failed_subpatches_with_matched_code.append((applied_percentage, subpatch_name, diff_obj.match_start_line))

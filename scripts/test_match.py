@@ -211,17 +211,17 @@ def find_diffs(patch_obj, file_name, retry_obj=None, match_distance=3000):
             cur_ratio = Levenshtein.ratio(file_line.strip(), stripped_patch_line)
             if cur_ratio > max_ratio:
                 max_ratio = cur_ratio
-                max_ratio_file_line = file_line.strip()
+                max_ratio_file_line = file_line
             if cur_ratio == 1:
                 break
         if max_ratio == 1 and patch_line[0] != parse.natureOfChange.REMOVED:
-            matched_file_lines.add(max_ratio_file_line) 
+            matched_file_lines.add(max_ratio_file_line.strip()) 
         elif max_ratio > LEVENSHTEIN_RATIO:
-            matched_file_lines.add(max_ratio_file_line) 
+            matched_file_lines.add(max_ratio_file_line.strip()) 
 
-            plaintext_diff = calculate_plaintext_diff(stripped_patch_line, max_ratio_file_line)
+            plaintext_diff = calculate_plaintext_diff(stripped_patch_line, max_ratio_file_line.strip())
 
-            language_specific_diff = calculate_language_diff(stripped_patch_line, max_ratio_file_line, file_name)
+            language_specific_diff = calculate_language_diff(stripped_patch_line, max_ratio_file_line.strip(), file_name)
 
             line_diff_obj = Diff.LineDiff(
                 patch_line = stripped_patch_line,
