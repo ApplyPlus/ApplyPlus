@@ -19,10 +19,7 @@ def get_args():
 def apply_reverse(pathToPatch):
     print ("Apply in reverse called")
 
-# This assumes that context changes are important if there is a context line with no match
 def are_context_changes_important(diff_obj):
-    # import random
-    # return bool(random.getrandbits(1))
     return False
 
 def apply(pathToPatch):
@@ -68,10 +65,8 @@ def apply(pathToPatch):
                 if fileName in does_not_apply:
                     subpatch_name =  ":".join([fileName, str(-patch._lineschanged[0])])
                     
-                    # TODO: Change this to apply the patch
                     # Try applying the subpatch as normal
-                    subpatch_run_success = patch.canApply(fileName)
-                    print(subpatch_run_success, subpatch_name)
+                    subpatch_run_success = patch.Apply(fileName)
                     if subpatch_run_success:
                         successful_subpatches.append(subpatch_name)
                     else:
@@ -102,8 +97,7 @@ def apply(pathToPatch):
                                     
                                 # We can apply the patch, context changes are not important
                                 else:
-                                    pass
-                                    # print(subpatch_name)
+                                    print(subpatch_name)
 
                             else:
                                 failed_subpatches_with_matched_code.append((applied_percentage, subpatch_name, diff_obj.match_start_line))

@@ -92,10 +92,10 @@ class Patch():
             'ascii', "ignore").decode('unicode_escape', "ignore") for s in orgPatch]
         for checkLines in range(len(orgPatch)):
             # Check if first line of patch exists
-            if (orgPatch[checkLines] == self._to_raw(self._lines[0][1])):
+            if (orgPatch[checkLines].strip() == self._to_raw(self._lines[1][1]).strip()):
                 patch_found_flag = True
-                for ite in range(1, len(self._lines)):
-                    if (orgPatch[checkLines+ite].strip() != self._lines[ite][1].strip() and self._lines[ite][1] != natureOfChange.ADDED):
+                for ite in range(2, len(self._lines)):
+                    if (orgPatch[checkLines+ite-1].strip() != self._lines[ite][1].strip() and self._lines[ite][0] != natureOfChange.ADDED):
                         patch_found_flag = False
                         break
                 if patch_found_flag:
@@ -113,16 +113,16 @@ class Patch():
                 'ascii').decode('unicode_escape') for s in orgPatch]
             for checkLines in range(len(orgPatch)):
                 # Check if first line of patch exists
-                if (orgPatch[checkLines] == self._lines[0][1]):
+                if (orgPatch[checkLines].strip() == self._lines[1][1].strip()):
                     patch_found_flag = True
                     for ite in range(1, len(self._lines)):
-                        if (orgPatch[checkLines+ite].strip() != self._lines[ite][1].strip() and self._lines[ite3][1] != natureOfChange.ADDED):
+                        if (orgPatch[checkLines+ite-1].strip() != self._lines[ite][1].strip() and self._lines[ite][0] != natureOfChange.ADDED):
                             patch_found_flag = False
                             break
                     if patch_found_flag:
                         #If the next line runs, we know the patch is applied here
                         ite2 = 0
-                        ite3 = 0
+                        ite3 = 1
                         goal = len(self._lines)
                         while(ite2 < goal and ite3 < len(self._lines)):
 
