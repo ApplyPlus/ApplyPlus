@@ -16,12 +16,13 @@ def get_args():
     args = parser.parse_args()
     return args
 
-
 def apply_reverse(pathToPatch):
     print ("Apply in reverse called")
 
-# TODO: Update this to actually run subpatch once code for that has been merged
-def run_subpatch(patch):
+# This assumes that context changes are important if there is a context line with no match
+def are_context_changes_important(diff_obj):
+    # import random
+    # return bool(random.getrandbits(1))
     return False
 
 def apply(pathToPatch):
@@ -56,54 +57,74 @@ def apply(pathToPatch):
         # TODO: Handle the not found files once functions to handle that have been merged
 
         # Handling sub patches do not apply
-        try_subpatches = input("Would you like to try and apply subpatches? [Y/n]\n")
+        try_subpatches = input("Would you like to try and apply subpatches? [Y/n] ")
         if try_subpatches.upper() == "Y":
             successful_subpatches = []
-            unsuccessful_subpatches = []
+            failed_subpatches_with_matched_code = []
+            subpatches_without_matched_code = []
             for patch in patch_file.patches:
                 # [1:] is used to remove the leading slash
-                if patch._fileName[1:] in does_not_apply:
-                    subpatch_run_success = run_subpatch(patch) 
+                fileName = patch._fileName[1:]
+                if fileName in does_not_apply:
+                    subpatch_name =  ":".join([fileName, str(-patch._lineschanged[0])])
+                    
+                    # TODO: Change this to apply the patch
+                    # Try applying the subpatch as normal
+                    subpatch_run_success = patch.canApply(fileName)
+                    print(subpatch_run_success, subpatch_name)
                     if subpatch_run_success:
-                        successful_subpatches.append(patch)
+                        successful_subpatches.append(subpatch_name)
                     else:
-                        unsuccessful_subpatches.append(patch)
+                        # Compute the diff between patch and file
+                        diff_obj = tm.find_diffs(patch, fileName)
+
+                        if diff_obj.match_status == tm.Diff.MatchStatus.MATCH_FOUND:
+                            added_line_count = 0
+                            removed_line_count = 0
+
+                            for line in patch.getLines():
+                                if line[0] == parse.natureOfChange.ADDED:
+                                    added_line_count += 1
+                                elif line[0] == parse.natureOfChange.REMOVED:
+                                    removed_line_count += 1
+
+                            applied_percentage = 100 - (len(diff_obj.added_diffs) + len(diff_obj.removed_diffs))/(added_line_count+removed_line_count)*100
+
+                            # Exact Patch Has Already Been Applied
+                            if len(diff_obj.context_diffs) == 0 and len(diff_obj.added_diffs) == 0 and len(diff_obj.removed_diffs) == 0 and len(diff_obj.additional_lines) == 0:
+                                successful_subpatches.append(subpatch_name)
+
+                            # No lines between the context lines other than parts of the patch (currently only case where we can apply patches)
+                            elif len(diff_obj.additional_lines) == 0: 
+                                # We should not apply the patch, context changes affect the code
+                                if are_context_changes_important(diff_obj):
+                                    failed_subpatches_with_matched_code.append((applied_percentage, subpatch_name, diff_obj.match_start_line))
+                                    
+                                # We can apply the patch, context changes are not important
+                                else:
+                                    pass
+                                    # print(subpatch_name)
+
+                            else:
+                                failed_subpatches_with_matched_code.append((applied_percentage, subpatch_name, diff_obj.match_start_line))
+
+                        else:
+                            subpatches_without_matched_code.append(subpatch_name)
+
+            if len(successful_subpatches) > 0:
+                print("\nHere are the subpatches that applied successfully:")
+                print("\n".join(successful_subpatches))
             
-            if len(successful_subpatches) != 0:
-                print("Here are the subpatches that applied successfully:")
-                for patch in successful_subpatches:
-                    print(":".join([patch._fileName, str(-patch._lineschanged[0])]))
-            
-            subpatches_with_matched_code = []
-            subpatches_without_matched_code = []
+            if len(failed_subpatches_with_matched_code) > 0:
+                failed_subpatches_with_matched_code.sort()
+                print("\nHere are the subpatches that did not apply automatically, but we think we found where the patch should be applied")
+                print("Note that if a subpatch has an Applied Percentage of 100%, that means that the context may have changed in ways that affect the code")
+                for applied_percentage, sp_name, line_number in failed_subpatches_with_matched_code:
+                    print("{} - Line Number: {} - Applied Percentage: {}%".format(sp_name, line_number, applied_percentage))
 
-            for patch in unsuccessful_subpatches:
-                subpatch_name =  ":".join([patch._fileName, str(-patch._lineschanged[0])])
-                patch_lines = patch._lines
-                line_number = patch._lineschanged[2]
-
-                file_path = os.path.join(os.getcwd(), patch._fileName[1:])
-
-                # Try searching for patch not applied in file
-                search_lines = [line[1] for line in tm.get_file_without_patch(patch_lines)]
-                match_start_line = tm.fuzzy_search(search_lines, file_path, line_number)
-
-                # Try searching for patch applied in file
-                if match_start_line == -1:
-                    search_lines = [line[1] for line in tm.get_file_with_patch(patch_lines)]
-                    match_start_line = tm.fuzzy_search(search_lines, file_path, line_number)
-                
-                if match_start_line == -1:
-                    subpatches_without_matched_code.append(subpatch_name)
-                else:
-                    subpatches_with_matched_code.append((subpatch_name, match_start_line))
-
-            print("Here are the subpatches that did not apply, but we think we found where the patch should be applied")
-            for sp_name, line_number in subpatches_with_matched_code:
-                print("{} - Line Number: {}".format(sp_name, line_number))
-
-            print("\nHere are the subpatches that did not apply, and we could not find where the patch should be applied")
-            print("\n".join(subpatches_without_matched_code))
+            if len(subpatches_without_matched_code) > 0:
+                print("\nHere are the subpatches that did not apply, and we could not find where the patch should be applied")
+                print("\n".join(subpatches_without_matched_code))
 
         return 1
 

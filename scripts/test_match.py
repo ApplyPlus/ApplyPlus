@@ -59,8 +59,11 @@ class Diff():
         NO_MATCH = 0
         MATCH_FOUND = 1
 
-    def __init__(self, match_status, removed_diffs = [], added_diffs = [], context_diffs = [], additional_lines = [], function_for_patch=""):
+    def __init__(self, match_status, match_start_line=-1, removed_diffs = [], added_diffs = [], 
+            context_diffs = [], additional_lines = [], function_for_patch=""):
+
         self.match_status = match_status
+        self.match_start_line = match_start_line
         self.removed_diffs = removed_diffs
         self.added_diffs = added_diffs
         self.context_diffs = context_diffs
@@ -174,7 +177,6 @@ def find_diffs(patch_obj, file_name, retry_obj=None, match_distance=3000):
     search_lines_with_type = get_file_with_patch(patch_lines)
     search_lines_without_type = [line[1] for line in search_lines_with_type]
     
-    # TODO: When searching for lines, remove blank context lines above and below
     match_start_line = fuzzy_search(search_lines_without_type, file_name, line_number, retry_obj)
 
     if match_start_line == -1:
@@ -199,8 +201,10 @@ def find_diffs(patch_obj, file_name, retry_obj=None, match_distance=3000):
     }
 
     matched_file_lines = set()
-    for idx, patch_line in enumerate(search_lines_with_type):
+    for idx, patch_line in enumerate(patch_lines):
         stripped_patch_line = patch_line[1].strip()
+        if len(stripped_patch_line) == 0:
+            continue
         max_ratio = 0
         max_ratio_file_line = ""
         for file_line in file_lines:
@@ -210,7 +214,7 @@ def find_diffs(patch_obj, file_name, retry_obj=None, match_distance=3000):
                 max_ratio_file_line = file_line.strip()
             if cur_ratio == 1:
                 break
-        if max_ratio == 1:
+        if max_ratio == 1 and patch_line[0] != parse.natureOfChange.REMOVED:
             matched_file_lines.add(max_ratio_file_line) 
         elif max_ratio > LEVENSHTEIN_RATIO:
             matched_file_lines.add(max_ratio_file_line) 
@@ -230,17 +234,23 @@ def find_diffs(patch_obj, file_name, retry_obj=None, match_distance=3000):
                 function_for_patch = function_for_patch,
             )
             patch_line_type_to_list[patch_line[0]].append(line_diff_obj)
-        else:
+        elif patch_line[0] != parse.natureOfChange.REMOVED:
             missing_diff = Diff.LineDiff(stripped_patch_line)
             patch_line_type_to_list[patch_line[0]].append(missing_diff)
 
     additional_lines = []
+    matched_line_count = 0
     for line in file_lines:
-        if line.strip() not in matched_file_lines:
+        if len(line.strip()) == 0:
+            continue
+        if line.strip() not in matched_file_lines and matched_line_count > 0 and matched_line_count < len(matched_file_lines):
             additional_lines.append(line.strip())
+        elif line.strip() in matched_file_lines:
+            matched_line_count += 1
                 
     return Diff(
         match_status=Diff.MatchStatus.MATCH_FOUND,
+        match_start_line=match_start_line,
         removed_diffs=removed_diffs,
         added_diffs=added_diffs,
         context_diffs=context_diffs,
