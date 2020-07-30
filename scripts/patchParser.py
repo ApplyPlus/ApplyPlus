@@ -89,18 +89,18 @@ class Patch():
         """
         orgPatch = open(applyTo).readlines()
         orgPatch = [s.replace("\n", "").encode(
-            'ascii').decode('unicode_escape') for s in orgPatch]
+            'ascii', "ignore").decode('unicode_escape', "ignore") for s in orgPatch]
         for checkLines in range(len(orgPatch)):
             # Check if first line of patch exists
-
             if (orgPatch[checkLines] == self._to_raw(self._lines[0][1])):
-
+                patch_found_flag = True
                 for ite in range(1, len(self._lines)):
                     if (orgPatch[checkLines+ite] != self._lines[ite][1]):
+                        patch_found_flag = False
                         break
+                if patch_found_flag:
                     return True
         return False
-
 
     def Apply(self, applyTo):
         """
@@ -114,10 +114,6 @@ class Patch():
             for checkLines in range(len(orgPatch)):
                 # Check if first line of patch exists
                 if (orgPatch[checkLines] == self._lines[0][1]):
-                    for ite in range(1, len(self._lines)):
-                        if (orgPatch[checkLines+ite] != self._lines[ite][1]):
-                            break
-                    #If the next line runs, we know the patch is applied here
                     ite2 = 0
                     ite3 = 0
                     goal = len(self._lines)
