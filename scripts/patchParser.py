@@ -88,7 +88,7 @@ class Patch():
         Returns True if this patch can be applied, false otherwise
         """
         orgPatch = open(applyTo).readlines()
-        orgPatch = [s.replace("\n", "").encode(
+        orgPatch = [s.strip("\n").encode(
             'ascii', "ignore").decode('unicode_escape', "ignore") for s in orgPatch]
         for checkLines in range(len(orgPatch)):
             # Check if first line of patch exists
@@ -109,7 +109,7 @@ class Patch():
         """
         if self.canApply(applyTo):
             orgPatch = open(applyTo).readlines()
-            orgPatch = [s.replace("\n", "").encode(
+            orgPatch = [s.strip("\n").encode(
                 'ascii').decode('unicode_escape') for s in orgPatch]
             for checkLines in range(len(orgPatch)):
                 # Check if first line of patch exists
