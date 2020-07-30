@@ -95,7 +95,7 @@ class Patch():
             if (orgPatch[checkLines] == self._to_raw(self._lines[0][1])):
                 patch_found_flag = True
                 for ite in range(1, len(self._lines)):
-                    if (orgPatch[checkLines+ite] != self._lines[ite][1]):
+                    if (orgPatch[checkLines+ite].strip() != self._lines[ite][1].strip() and self._lines[ite][1] != natureOfChange.ADDED):
                         patch_found_flag = False
                         break
                 if patch_found_flag:
@@ -114,36 +114,44 @@ class Patch():
             for checkLines in range(len(orgPatch)):
                 # Check if first line of patch exists
                 if (orgPatch[checkLines] == self._lines[0][1]):
-                    ite2 = 0
-                    ite3 = 0
-                    goal = len(self._lines)
-                    while(ite2 < goal and ite3 < len(self._lines)):
-                        
-                        if(self._lines[ite3][0] == natureOfChange.REMOVED):
-                            goal -= 1
-                            print(self._lines[ite3][1])
-                            orgPatch.remove(self._lines[ite3][1])
-                            ite3 += 1
-                            continue
-                        if(self._lines[ite3][0] == natureOfChange.ADDED):
-                            
-                            ite2 += 1
-                            orgPatch.insert(
-                                checkLines+ite2, self._lines[ite3][1])
-                            ite3 += 1
-                            continue
-                        if(self._lines[ite3][0] == natureOfChange.CONTEXT):
-                            ite2 += 1
-                            ite3 += 1
-                            continue
-                    writeobj = open(applyTo, "w")
-                    for i in orgPatch:
-                        writeobj.write(i+"\n")
-                    writeobj.close()
-                    return True
+                    patch_found_flag = True
+                    for ite in range(1, len(self._lines)):
+                        if (orgPatch[checkLines+ite].strip() != self._lines[ite][1].strip() and self._lines[ite3][1] != natureOfChange.ADDED):
+                            patch_found_flag = False
+                            break
+                    if patch_found_flag:
+                        #If the next line runs, we know the patch is applied here
+                        ite2 = 0
+                        ite3 = 0
+                        goal = len(self._lines)
+                        while(ite2 < goal and ite3 < len(self._lines)):
+
+                            if(self._lines[ite3][0] == natureOfChange.REMOVED):
+                                goal -= 1
+                                for ll in orgPatch:
+                                    if(ll.strip() == self._lines[ite3][1]):
+                                        orgPatch.remove(ll)
+                                # orgPatch.remove(self._lines[ite3][1].strip())
+                                ite3 += 1
+                                continue
+                            if(self._lines[ite3][0] == natureOfChange.ADDED):
+
+                                ite2 += 1
+                                orgPatch.insert(
+                                    checkLines+ite2, self._lines[ite3][1])
+                                ite3 += 1
+                                continue
+                            if(self._lines[ite3][0] == natureOfChange.CONTEXT):
+                                ite2 += 1
+                                ite3 += 1
+                                continue
+                        writeobj = open(applyTo, "w")
+                        for i in orgPatch:
+                            writeobj.write(i+"\n")
+                        writeobj.close()
+                        return True
 
         return False
-            
             
         
 
@@ -238,6 +246,5 @@ class PatchFile():
                 patchObj.addLines(natureOfChange.CONTEXT, line)
 
         self.patches.append(patchObj)
-
 
 
