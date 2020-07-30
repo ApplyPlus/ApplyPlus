@@ -219,21 +219,16 @@ class PatchFile():
                 patchObj = Patch(filename)
 
             elif line[0:2] == '@@':
-                if line[-2:] == "@@":
-                    # To handle cases where the line number
-                    #  is the only information available in that line
-                    pass
+                contextline = line[2:].split(' @@ ')[-1]
+                if len(patchObj.getLines()) != 0:
+                    filename = patchObj.getFileName()
+                    self.patches.append(patchObj)
+                    patchObj = Patch(filename)
+                    patchObj.setLinesChanged(line)
                 else:
-                    contextline = line[2:].split(' @@ ')[-1]
-                    if len(patchObj.getLines()) != 0:
-                        filename = patchObj.getFileName()
-                        self.patches.append(patchObj)
-                        patchObj = Patch(filename)
-                        patchObj.setLinesChanged(line)
-                    else:
-                        patchObj.setLinesChanged(line)
+                    patchObj.setLinesChanged(line)
 
-                    patchObj.addLines(natureOfChange.CONTEXT, contextline, )
+                patchObj.addLines(natureOfChange.CONTEXT, contextline, )
 
             elif line[0] == "-":
                 contextline = line[1:]
