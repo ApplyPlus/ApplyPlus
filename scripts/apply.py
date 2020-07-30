@@ -65,9 +65,8 @@ def apply(pathToPatch):
                 if fileName in does_not_apply:
                     subpatch_name =  ":".join([fileName, str(-patch._lineschanged[0])])
                     
-                    # TODO: Change this to apply patch instead of just checking if we can
                     # Try applying the subpatch as normal
-                    subpatch_run_success = patch.canApply(fileName)
+                    subpatch_run_success = patch.Apply(fileName)
                     if subpatch_run_success:
                         successful_subpatches.append(subpatch_name)
                     else:
@@ -98,7 +97,7 @@ def apply(pathToPatch):
                                     failed_subpatches_with_matched_code.append((applied_percentage, subpatch_name, diff_obj.match_start_line))
                                     
                                 # We try to apply the patch, context changes are not important
-                                # However, in our case below, we still check to see if added/removed lines either must be not applied at all or applied completely
+                                # The case below is only for cases where the context is the only thing that is changed or a line has been completely added or removed with no similar lines
                                 else:
                                     new_patch_lines = [patch_lines[0]]
                                     context_diff_index = 0
@@ -118,26 +117,20 @@ def apply(pathToPatch):
                                                 new_patch_lines.append(line)
                                         elif line[0] == parse.natureOfChange.ADDED:
                                             if added_diff_index < len(diff_obj.added_diffs) and diff_obj.added_diffs[added_diff_index].patch_line.strip() == line[1].strip():
-                                                if diff_obj.added_diffs[added_diff_index].is_missing:
-                                                    new_patch_lines.append(line)
-                                                else:
-                                                    set_new_patch_lines = False
-                                                    break
+                                                new_patch_lines.append(line)
+                                                added_diff_index += 1
                                             else:
                                                 new_patch_lines.append((parse.natureOfChange.CONTEXT, line[1]))
                                         elif line[0] == parse.natureOfChange.REMOVED:
                                             if removed_diff_index < len(diff_obj.removed_diffs) and diff_obj.removed_diffs[removed_diff_index].patch_line.strip() == line[1].strip():
-                                                if diff_obj.removed_diffs[removed_diff_index].patch_line.strip() == diff_obj.removed_diffs[removed_diff_index].file_line.strip():
-                                                    new_patch_lines.append(line)
-                                                else:
-                                                    set_new_patch_lines = False
-                                                    break
+                                                new_patch_lines.append(line)
+                                                removed_diff_index += 1
+                                            # need to check case where similar line is added
 
                                     if set_new_patch_lines:
                                         old_patch_lines = patch._lines
                                         patch._lines = new_patch_lines
-                                        # TODO: Make this apply the change
-                                        if patch.canApply(fileName):
+                                        if patch.Apply(fileName):
                                             successful_subpatches.append(subpatch_name)
                                         else:
                                             # TODO: Sometimes, moving lines causes an issue, will have to think of a fix that doesn't break a ton of cases

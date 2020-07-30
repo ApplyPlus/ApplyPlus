@@ -94,8 +94,20 @@ class Patch():
             # Check if first line of patch exists
             if (orgPatch[checkLines].strip() == self._to_raw(self._lines[1][1]).strip()):
                 patch_found_flag = True
+                blank_line_offset_patch = 0
+                blank_line_offset_file = 0
+                added_offset = 0
                 for ite in range(2, len(self._lines)):
-                    if (orgPatch[checkLines+ite-1].strip() != self._lines[ite][1].strip() and self._lines[ite][0] != natureOfChange.ADDED):
+                    original_patch_offset = checkLines + ite-1-blank_line_offset_file - added_offset
+                    if self._lines[ite-blank_line_offset_patch][0] == natureOfChange.ADDED:
+                        added_offset += 1
+                    elif (orgPatch[original_patch_offset].strip() != self._lines[ite-blank_line_offset_patch][1].strip()):
+                        if len(orgPatch[original_patch_offset].strip()) == 0:
+                            blank_line_offset_file += 1
+                            continue
+                        elif len(self._lines[ite-blank_line_offset_patch][1].strip()) == 0:
+                            blank_line_offset_patch += 1
+                            continue
                         patch_found_flag = False
                         break
                 if patch_found_flag:
@@ -110,13 +122,25 @@ class Patch():
         if self.canApply(applyTo):
             orgPatch = open(applyTo).readlines()
             orgPatch = [s.strip("\n").encode(
-                'ascii').decode('unicode_escape') for s in orgPatch]
+                'ascii', "ignore").decode('unicode_escape', "ignore") for s in orgPatch]
             for checkLines in range(len(orgPatch)):
                 # Check if first line of patch exists
-                if (orgPatch[checkLines].strip() == self._lines[1][1].strip()):
+                if (orgPatch[checkLines].strip() == self._to_raw(self._lines[1][1]).strip()):
                     patch_found_flag = True
-                    for ite in range(1, len(self._lines)):
-                        if (orgPatch[checkLines+ite-1].strip() != self._lines[ite][1].strip() and self._lines[ite][0] != natureOfChange.ADDED):
+                    blank_line_offset_patch = 0
+                    blank_line_offset_file = 0
+                    added_offset = 0
+                    for ite in range(2, len(self._lines)):
+                        original_patch_offset = checkLines + ite-1-blank_line_offset_file - added_offset
+                        if self._lines[ite-blank_line_offset_patch][0] == natureOfChange.ADDED:
+                            added_offset += 1
+                        elif (orgPatch[original_patch_offset].strip() != self._lines[ite-blank_line_offset_patch][1].strip()):
+                            if len(orgPatch[original_patch_offset].strip()) == 0:
+                                blank_line_offset_file += 1
+                                continue
+                            elif len(self._lines[ite-blank_line_offset_patch][1].strip()) == 0:
+                                blank_line_offset_patch += 1
+                                continue
                             patch_found_flag = False
                             break
                     if patch_found_flag:
@@ -128,23 +152,22 @@ class Patch():
 
                             if(self._lines[ite3][0] == natureOfChange.REMOVED):
                                 goal -= 1
-                                for ll in orgPatch:
-                                    if(ll.strip() == self._lines[ite3][1].strip()):
-                                        orgPatch.remove(ll)
-                                # orgPatch.remove(self._lines[ite3][1].strip())
+                                orgPatch.pop(checkLines+ite2)
                                 ite3 += 1
-                                continue
-                            if(self._lines[ite3][0] == natureOfChange.ADDED):
-
-                                ite2 += 1
+                            elif(self._lines[ite3][0] == natureOfChange.ADDED):
                                 orgPatch.insert(
                                     checkLines+ite2, self._lines[ite3][1])
-                                ite3 += 1
-                                continue
-                            if(self._lines[ite3][0] == natureOfChange.CONTEXT):
                                 ite2 += 1
                                 ite3 += 1
-                                continue
+                            elif(self._lines[ite3][0] == natureOfChange.CONTEXT):
+                                if (self._lines[ite3][1].strip() != orgPatch[checkLines+ite2].strip()):
+                                    if (len(self._lines[ite3][1].strip()) == 0):
+                                        ite3 += 1
+                                    else:
+                                        ite2 += 1
+                                else:
+                                    ite2 += 1
+                                    ite3 += 1
                         writeobj = open(applyTo, "w")
                         for i in orgPatch:
                             i= i.replace('\n', '\\n')
