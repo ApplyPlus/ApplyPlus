@@ -29,7 +29,7 @@ def context_changes(patch_file_path):
     """
     context_changes(str): takes in a patch file path and 
         returns a ContextResult object that determines 
-        weather to run the patch or not and an associate 
+        whether to run the patch or not and an associate 
         message that can be shown to users
 
     patch_file_path: string representing the path to a patch file
