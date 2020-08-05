@@ -80,8 +80,11 @@ def calculate_plaintext_diff(patch_line, file_line):
     return diff_tokens
 
 def calculate_language_diff(patch_line, file_line, file_name):
-    lexer = get_lexer_for_filename(file_name)
-    language = Diff.LineDiff.LanguageSpecificDiff.lexer_to_language[type(lexer)]
+    try:
+        lexer = get_lexer_for_filename(file_name)
+        language = Diff.LineDiff.LanguageSpecificDiff.lexer_to_language[type(lexer)]
+    except:
+        language = Diff.LineDiff.LanguageSpecificDiff.Language.NOT_SUPPORTED
 
     if language == Diff.LineDiff.LanguageSpecificDiff.Language.NOT_SUPPORTED:
         return Diff.LineDiff.LanguageSpecificDiff()
@@ -168,19 +171,84 @@ def get_file_without_patch(patch_lines):
     
     return search_lines
 
+def is_already_moved(patch_idx, patch_lines, file_idx, file_lines):
+    check_lines = []
+
+    cur_patch_idx = patch_idx - 1
+
+    while cur_patch_idx >= 0:
+        if patch_lines[cur_patch_idx][0] != parse.natureOfChange.ADDED:
+            check_lines.append(patch_lines[cur_patch_idx][1].strip())
+            if len(check_lines) == 2:
+                break
+        cur_patch_idx -= 1
+    
+    check_lines = check_lines[::-1]
+    check_lines.append(patch_lines[patch_idx][1].strip())
+
+    cur_patch_idx = patch_idx + 1
+    next_non_removed = ""
+    while cur_patch_idx < len(patch_lines):
+        if patch_lines[cur_patch_idx][0] != parse.natureOfChange.ADDED:
+            check_lines.append(patch_lines[cur_patch_idx][1].strip())
+            if len(check_lines) == 5:
+                break
+        cur_patch_idx += 1
+    
+    print(check_lines, patch_lines[patch_idx])
+    check_idx = 0
+    for cur_file_idx in range(file_idx-2, file_idx+3):
+        if cur_file_idx < 0 or cur_file_idx >= len(file_lines):
+            continue
+        if check_lines[check_idx] != file_lines[cur_file_idx].strip():
+            return True
+        check_idx += 1
+    
+    return False 
+
+
+def compare_nearby(patch_idx, patch_lines, file_idx, file_lines):
+    above_res = True
+    below_res = True
+
+    cur_patch_idx = patch_idx-1
+    prev_non_removed = ""
+    while cur_patch_idx >= 0:
+        if patch_lines[cur_patch_idx][0] != parse.natureOfChange.REMOVED:
+            prev_non_removed = patch_lines[cur_patch_idx][1].strip()
+            break
+        cur_patch_idx -= 1
+    
+    cur_patch_idx = patch_idx + 1
+    next_non_removed = ""
+    while cur_patch_idx < len(patch_lines):
+        if patch_lines[cur_patch_idx][0] != parse.natureOfChange.REMOVED:
+            next_non_removed= patch_lines[cur_patch_idx][1].strip()
+            break
+        cur_patch_idx += 1
+
+    if file_idx != 0:
+        if len(prev_non_removed) != 0:
+            above_res = Levenshtein.ratio(prev_non_removed, file_lines[file_idx-1].strip()) > LEVENSHTEIN_RATIO
+    if file_idx < len(file_lines)-1:
+        if len(next_non_removed) != 0:
+            below_res = Levenshtein.ratio(next_non_removed, file_lines[file_idx+1].strip()) > LEVENSHTEIN_RATIO
+    
+    return above_res and below_res
+
 # Returns an object containing information about the difference between a file and a patch
 def find_diffs(patch_obj, file_name, retry_obj=None, match_distance=3000):
     dmp.Match_Distance = match_distance 
     function_for_patch, patch_lines = patch_obj._lines[0][1], patch_obj._lines[1:]
     line_number = patch_obj._lineschanged[2] 
 
-    search_lines_with_type = get_file_with_patch(patch_lines)
+    search_lines_with_type = get_file_without_patch(patch_lines)
     search_lines_without_type = [line[1] for line in search_lines_with_type]
     
     match_start_line = fuzzy_search(search_lines_without_type, file_name, line_number, retry_obj)
 
     if match_start_line == -1:
-        search_lines_with_type = get_file_without_patch(patch_lines)
+        search_lines_with_type = get_file_with_patch(patch_lines)
         search_lines_without_type = [line[1] for line in search_lines_with_type]
         match_start_line = fuzzy_search(search_lines_without_type, file_name, line_number, retry_obj)
     
@@ -200,6 +268,8 @@ def find_diffs(patch_obj, file_name, retry_obj=None, match_distance=3000):
         parse.natureOfChange.CONTEXT : context_diffs
     }
 
+    added_lines = set([line[1].strip() for line in patch_lines])
+
     matched_file_lines = set()
     for idx, patch_line in enumerate(patch_lines):
         stripped_patch_line = patch_line[1].strip()
@@ -207,17 +277,25 @@ def find_diffs(patch_obj, file_name, retry_obj=None, match_distance=3000):
             continue
         max_ratio = 0
         max_ratio_file_line = ""
-        for file_line in file_lines:
+        matched_file_idx = -1
+        for file_idx in range(len(file_lines)):
+            file_line = file_lines[file_idx]
             cur_ratio = Levenshtein.ratio(file_line.strip(), stripped_patch_line)
-            if cur_ratio > max_ratio:
+            if cur_ratio >= max_ratio:
+                if cur_ratio == max_ratio and not compare_nearby(idx, patch_lines, file_idx, file_lines):
+                    continue
                 max_ratio = cur_ratio
                 max_ratio_file_line = file_line
-            if cur_ratio == 1:
-                break
+                matched_file_idx = file_idx
         if max_ratio == 1 and patch_line[0] != parse.natureOfChange.REMOVED:
             matched_file_lines.add(max_ratio_file_line.strip()) 
         elif max_ratio > LEVENSHTEIN_RATIO:
-            matched_file_lines.add(max_ratio_file_line.strip()) 
+            # Attempt at trying to filter out moved lines
+            if patch_line[0] == parse.natureOfChange.REMOVED and max_ratio_file_line.strip() in added_lines and\
+                    is_already_moved(idx, patch_lines, matched_file_idx, file_lines):
+                continue
+
+            matched_file_lines.add(max_ratio_file_line.strip())
 
             plaintext_diff = calculate_plaintext_diff(stripped_patch_line, max_ratio_file_line.strip())
 

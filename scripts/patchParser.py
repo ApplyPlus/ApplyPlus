@@ -94,22 +94,29 @@ class Patch():
             # Check if first line of patch exists
             if (orgPatch[checkLines].strip() == self._to_raw(self._lines[1][1]).strip()):
                 patch_found_flag = True
-                blank_line_offset_patch = 0
                 blank_line_offset_file = 0
                 added_offset = 0
-                for ite in range(2, len(self._lines)):
+                ite = 2
+                while ite < len(self._lines):
                     original_patch_offset = checkLines + ite-1-blank_line_offset_file - added_offset
-                    if self._lines[ite-blank_line_offset_patch][0] == natureOfChange.ADDED:
-                        added_offset += 1
-                    elif (orgPatch[original_patch_offset].strip() != self._lines[ite-blank_line_offset_patch][1].strip()):
-                        if len(orgPatch[original_patch_offset].strip()) == 0:
-                            blank_line_offset_file += 1
-                            continue
-                        elif len(self._lines[ite-blank_line_offset_patch][1].strip()) == 0:
-                            blank_line_offset_patch += 1
-                            continue
+                    if original_patch_offset >= len(orgPatch):
                         patch_found_flag = False
                         break
+                    if self._lines[ite][0] == natureOfChange.ADDED and orgPatch[original_patch_offset].strip():
+                        if orgPatch[original_patch_offset].strip() == self._lines[ite][1].strip():
+                            self._lines[ite] = (natureOfChange.CONTEXT, self._lines[ite][1])
+                        else:
+                            added_offset += 1
+                    elif (orgPatch[original_patch_offset].strip() != self._lines[ite][1].strip()):
+                        if len(orgPatch[original_patch_offset].strip()) == 0:
+                            blank_line_offset_file -= 1
+                            ite -= 1
+                        elif len(self._lines[ite][1].strip()) == 0:
+                            blank_line_offset_file += 1
+                        else:
+                            patch_found_flag = False
+                            break
+                    ite += 1
                 if patch_found_flag:
                     return True
         return False
@@ -127,22 +134,26 @@ class Patch():
                 # Check if first line of patch exists
                 if (orgPatch[checkLines].strip() == self._to_raw(self._lines[1][1]).strip()):
                     patch_found_flag = True
-                    blank_line_offset_patch = 0
                     blank_line_offset_file = 0
                     added_offset = 0
-                    for ite in range(2, len(self._lines)):
+                    ite = 2
+                    while ite < len(self._lines):
                         original_patch_offset = checkLines + ite-1-blank_line_offset_file - added_offset
-                        if self._lines[ite-blank_line_offset_patch][0] == natureOfChange.ADDED:
-                            added_offset += 1
-                        elif (orgPatch[original_patch_offset].strip() != self._lines[ite-blank_line_offset_patch][1].strip()):
-                            if len(orgPatch[original_patch_offset].strip()) == 0:
-                                blank_line_offset_file += 1
-                                continue
-                            elif len(self._lines[ite-blank_line_offset_patch][1].strip()) == 0:
-                                blank_line_offset_patch += 1
-                                continue
+                        if original_patch_offset >= len(orgPatch):
                             patch_found_flag = False
                             break
+                        if self._lines[ite][0] == natureOfChange.ADDED:
+                            added_offset += 1
+                        elif (orgPatch[original_patch_offset].strip() != self._lines[ite][1].strip()):
+                            if len(orgPatch[original_patch_offset].strip()) == 0:
+                                blank_line_offset_file -= 1
+                                ite -= 1
+                            elif len(self._lines[ite][1].strip()) == 0:
+                                blank_line_offset_file -= 1
+                            else:
+                                patch_found_flag = False
+                                break
+                        ite += 1
                     if patch_found_flag:
                         #If the next line runs, we know the patch is applied here
                         ite2 = 0
