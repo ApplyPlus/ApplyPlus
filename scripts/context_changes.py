@@ -66,7 +66,7 @@ def context_changes(sub_patch):
         return context_result
         
     apply_patch = True
-    output_message ""
+    output_message = ""
     context_diff_count = 1
     for context_diff in diff_file_patch.context_diffs:
         if context_diff.match_ratio < match.LEVENSHTEIN_RATIO:
@@ -88,9 +88,9 @@ def context_changes(sub_patch):
             apply_patch &= CONTEXT_DECISION.DONT_RUN.value
         
         diff_match = dmp_module.diff_match_patch()
-                    line_patch_diffs = diff_match.diff_main(
-                            context_diff.file_line, context_diff.patch_line
-                    )
+        line_patch_diffs = diff_match.diff_main(
+                context_diff.file_line, context_diff.patch_line
+        )
         
         # TODO: verify if this line runs
         if not line_patch_diffs:
@@ -122,6 +122,10 @@ def context_changes(sub_patch):
                     apply_patch &= CONTEXT_DECISION.RUN.value
 
                 break
+            
+            else:
+                # TODO: verify this is the correct
+                apply_patch &= CONTEXT_DECISION.RUN.value
         
         context_diff_count += 1
         
