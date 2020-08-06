@@ -35,7 +35,7 @@ def context_changes(sub_patch):
     patch_file_path: string representing the path to a patch file
     """
 
-    file_name = patch.getFileName()
+    file_name = sub_patch.getFileName()
 
     # TODO: update this to not be hardcoded
     file_path = f"../../../msm-3.10{file_name}"
