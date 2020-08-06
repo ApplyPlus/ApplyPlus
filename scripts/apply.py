@@ -23,14 +23,13 @@ def are_context_changes_important(diff_obj):
     return False
 
 def apply(pathToPatch):
-    print("apply called")
     patch_file = parse.PatchFile(pathToPatch)
     patch_file.runPatch()
     if(patch_file.runSuccess == True):
         print("Successfully applied")
         return 0
     else:
-        print("Patch failed with error:")
+        print("Patch failed while it was run with git apply with error:")
         error_message = patch_file.runResult.decode('utf-8')
         print(error_message)
 
@@ -70,8 +69,9 @@ def apply(pathToPatch):
                 skip_current_patch = True 
                 if not try_all_subpatches:
                     print("\nFailed Subpatch : {}\n".format(subpatch_name))
+                    print("\nContents of the patch-")
                     print(patch)
-                    try_current_subpatch = (input("\nWould you like to try apply this subpatch? [Y/n] ").upper() != "Y")
+                    skip_current_patch = (input("\nWould you like to try apply this subpatch? [Y/n] ").upper() != "Y")
                 
                 if not try_all_subpatches and skip_current_patch:
                     not_tried_subpatches.append(subpatch_name)
@@ -145,9 +145,10 @@ def apply(pathToPatch):
                                 else:
                                     print("Issue with current assumption in terms of what patches can be applied")
                                     print(subpatch_name)
+                                    print("\nContents of the patch-")
                                     print(patch)
                                     failed_subpatches_with_matched_code.append((applied_percentage, subpatch_name, diff_obj.match_start_line))
-
+                                    print("----------------------------------------------------------------------")
                         else:
                             failed_subpatches_with_matched_code.append((applied_percentage, subpatch_name, diff_obj.match_start_line))
 
@@ -155,22 +156,24 @@ def apply(pathToPatch):
                         subpatches_without_matched_code.append(subpatch_name)
 
         if len(successful_subpatches) > 0:
-            print("\nHere are the subpatches that applied successfully:")
+            print("\nSubpatches that applied successfully:")
             print("\n".join(successful_subpatches))
+            print("----------------------------------------------------------------------")
         
         if len(failed_subpatches_with_matched_code) > 0:
             failed_subpatches_with_matched_code.sort()
-            print("\nHere are the subpatches that did not apply automatically, but we think we found where the patch should be applied")
-            print("Note that if a subpatch has an Applied Percentage of 100%, that means that the context may have changed in ways that affect the code")
+            print("\nHere are the subpatches that did not apply automatically, but we think we found where the patch should be applied\n")
+
             for applied_percentage, sp_name, line_number in failed_subpatches_with_matched_code:
                 print("{} - Line Number: {} - Applied Percentage: {}%".format(sp_name, line_number, applied_percentage))
-
+            print("Note that if a subpatch has an Applied Percentage of 100%, that means that the context may have changed in ways that affect the code")
+            print("----------------------------------------------------------------------")
         if len(subpatches_without_matched_code) > 0:
-            print("\nHere are the subpatches that did not apply, and we could not find where the patch should be applied")
+            print("Subpatches that did not apply, and we could not find where the patch should be applied:")
             print("\n".join(subpatches_without_matched_code))
-        
+            print("----------------------------------------------------------------------")
         if len(not_tried_subpatches) > 0:
-            print("\nHere are the subpatches that we did not try and apply")
+            print("\nSubpatches that we did not try and apply:")
             print("\n".join(not_tried_subpatches))
 
         return 1
