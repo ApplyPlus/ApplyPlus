@@ -71,14 +71,17 @@ def context_changes(sub_patch):
     
     for context_diff in diff_file_patch.context_diffs:
         if context_diff.match_ratio < match.LEVENSHTEIN_RATIO:
-            output_message += (f"Context Diff #{context_diff_count}: The match ratio between the source and patch code was low. We received a match ratio of {context_diff.match_ratio}, expected a ratio greater than or equal to {match.LEVENSHTEIN_RATIO}. The patch line was {context_diff.patch_line} whereas the file line was {context_diff.file_line}\n")
+            output_message += (f"Context Diff #{context_diff_count}: The match ratio between the source and patch code was low. " 
+                f"We received a match ratio of {context_diff.match_ratio}, expected a ratio greater than or equal to {match.LEVENSHTEIN_RATIO}. " 
+                f"The patch line was {context_diff.patch_line} whereas the file line was {context_diff.file_line}\n")
                 
             apply_patch &= CONTEXT_DECISION.DONT_RUN.value
             context_diff_count += 1
             continue
 
         elif re.search('^(\w+( )?){2,}\([^!@#$+%^]+?\)', context_diff.file_line):
-            output_message += (f"Context Diff #{context_diff_count}: We noticed a context-related difference between the function in the source code [{context_diff.file_line}] We are suggesting to replace this function with [{context_diff.patch_line}]\n")
+            output_message += (f"Context Diff #{context_diff_count}: We noticed a context-related difference between the "
+                f"function in the source code [{context_diff.file_line}] We are suggesting to replace this function with [{context_diff.patch_line}]\n")
             
             # TODO: should we give information from the slicer here? 
             # TODO: should this be a false?
@@ -117,7 +120,8 @@ def context_changes(sub_patch):
 
                     
                 else:
-                    output_message += (f"Context Diff #{context_diff_count}: R-Value change but function name was not supplied by matching code, we can not provide slicer information\n")
+                    output_message += (f"Context Diff #{context_diff_count}: R-Value change but function name was not " 
+                        f"supplied by matching code, we can not provide slicer information\n")
                     apply_patch &= CONTEXT_DECISION.RUN.value
 
                 break
