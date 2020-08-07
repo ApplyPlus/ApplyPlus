@@ -4,6 +4,7 @@ import patchParser as parse
 # import check_file_exists_elsewhere as fileCheck
 import test_match as tm
 import os
+import context_changes as cc
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -18,9 +19,6 @@ def get_args():
 
 def apply_reverse(pathToPatch):
     print ("Apply in reverse called")
-
-def are_context_changes_important(diff_obj):
-    return False
 
 def apply(pathToPatch):
     print("apply called")
@@ -82,9 +80,11 @@ def apply(pathToPatch):
                 if subpatch_run_success:
                     successful_subpatches.append(subpatch_name)
                 else:
-                # Compute the diff between patch and file
-                    diff_obj = tm.find_diffs(patch, fileName, retry_obj=tm.Retry(3,100))
-
+                    context_change_obj = cc.context_changes(patch)
+                    diff_obj = context_change_obj.diff_obj
+                    context_decision = context_change_obj.status
+                    context_decision_msg = context_change_obj.messages
+                    
                     if diff_obj.match_status == tm.Diff.MatchStatus.MATCH_FOUND:
                         added_line_count = 0
                         removed_line_count = 0
@@ -105,7 +105,7 @@ def apply(pathToPatch):
                         # No lines between the context lines other than parts of the patch (currently only case where we can apply patches)
                         elif len(diff_obj.additional_lines) == 0: 
                             # We should not apply the patch, context changes affect the code
-                            if are_context_changes_important(diff_obj):
+                            if context_decision == cc.CONTEXT_DECISION.DONT_RUN:
                                 failed_subpatches_with_matched_code.append((applied_percentage, subpatch_name, diff_obj.match_start_line))
                                 
                             # We try to apply the patch, context changes are not important

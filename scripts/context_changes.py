@@ -13,13 +13,14 @@ class ContextResult:
     run_patch: Boolean that determines if the patch 
         should still be applied
 
-    message: Is a string that describes the output 
+    message: Is a string that describes the output
         of the context related changes 
     """
 
-    def __init__(self, status, messages):
+    def __init__(self, status, messages, diff_obj):
         self.status = status
         self.messages = messages
+        self.diff_obj = diff_obj
 
 class CONTEXT_DECISION(Enum):
     DONT_RUN = 0
@@ -38,7 +39,7 @@ def context_changes(sub_patch):
     file_name = sub_patch.getFileName()
 
     # TODO: update this to not be hardcoded
-    file_path = f"../../../msm-3.10{file_name}"
+    file_path = f"../msm-3.10{file_name}"
 
     file_slice = slice.SliceParser(file_path)
     file_slice_parsed = file_slice.slice_parse()
@@ -53,14 +54,14 @@ def context_changes(sub_patch):
 
     if diff_file_patch.match_status != match.Diff.MatchStatus.MATCH_FOUND:
         context_result = ContextResult(CONTEXT_DECISION.DONT_RUN.value, 
-            "A context match was not found.")
+            "A context match was not found.", diff_file_patch)
         
         return context_result
         
     
     if not diff_file_patch.context_diffs:
         context_result = ContextResult(CONTEXT_DECISION.RUN.value, 
-            "No context related issues found.")
+            "No context related issues found.", diff_file_patch)
         
         return context_result
         
@@ -127,4 +128,4 @@ def context_changes(sub_patch):
         
         context_diff_count += 1
         
-    return ContextResult(apply_patch, output_message)
+    return ContextResult(apply_patch, output_message, diff_file_patch)

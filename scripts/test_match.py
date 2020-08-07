@@ -195,7 +195,6 @@ def is_already_moved(patch_idx, patch_lines, file_idx, file_lines):
                 break
         cur_patch_idx += 1
     
-    print(check_lines, patch_lines[patch_idx])
     check_idx = 0
     for cur_file_idx in range(file_idx-2, file_idx+3):
         if cur_file_idx < 0 or cur_file_idx >= len(file_lines):
