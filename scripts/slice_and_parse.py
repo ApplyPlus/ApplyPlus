@@ -18,7 +18,7 @@ class SliceParser:
         self.file = file
 
     def slice_parse(self):
-        p = subprocess.Popen(["srcML", f"{self.file}", "--position"], stdout=subprocess.PIPE)
+        p = subprocess.Popen(["srcml", f"{self.file}", "--position"], stdout=subprocess.PIPE)
         out, err = p.communicate()
 
         fd, path = tfile.mkstemp(suffix=".xml", prefix="temp")
@@ -26,7 +26,7 @@ class SliceParser:
             with os.fdopen(fd, "w") as tmpo:
                 tmpo.write(str(out, "utf-8"))
             p = subprocess.Popen(
-                ["build/bin/srcSlice", f"{path}"],
+               ["build/bin/srcSlice", f"{path}"],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
             )
