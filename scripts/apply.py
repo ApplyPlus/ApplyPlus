@@ -4,6 +4,7 @@ import patchParser as parse
 # import check_file_exists_elsewhere as fileCheck
 import test_match as tm
 import os
+import time
 import context_changes as cc
 
 def get_args():
@@ -51,34 +52,39 @@ def apply(pathToPatch):
         # TODO: Handle the not found files once functions to handle that have been merged
 
         # Handling sub patches do not apply
-        try_all_subpatches_input = input("Would you like to try and apply all subpatches? [Y/n] ")
-        try_all_subpatches = (try_all_subpatches_input.upper() == "Y")
+        # try_all_subpatches_input = input("Would you like to try and apply all subpatches? [Y/n] ")
+        try_all_subpatches = True
         successful_subpatches = []
         failed_subpatches_with_matched_code = []
         subpatches_without_matched_code = []
-        not_tried_subpatches = []
-
+        # not_tried_subpatches = []
+        see_patches = input("We have found {} subpatches in the patch file. Would you like to see them?[Y/n] ".format(len(patch_file.patches)))
+        see_patches = (see_patches.upper() == "Y")
         for patch in patch_file.patches:
             fileName = patch._fileName[1:]
+            if see_patches:
+                print(":".join([fileName, str(-patch._lineschanged[0])]))
+                print(patch)
+                print("----------------------------------------------------------------------")
             if fileName in does_not_apply:
                 # [1:] is used to remove the leading slash
                 subpatch_name =  ":".join([fileName, str(-patch._lineschanged[0])])
 
-                skip_current_patch = True 
-                if not try_all_subpatches:
-                    print("\nFailed Subpatch : {}\n".format(subpatch_name))
-                    print("\nContents of the patch-")
-                    print(patch)
-                    skip_current_patch = (input("\nWould you like to try apply this subpatch? [Y/n] ").upper() != "Y")
+                # skip_current_patch = True 
+                # if not try_all_subpatches:
+                #     print("\nFailed Subpatch : {}\n".format(subpatch_name))
+                    
+                #     print(patch)
+                #     skip_current_patch = (input("\nWould you like to try apply this subpatch? [Y/n] ").upper() != "Y")
                 
-                if not try_all_subpatches and skip_current_patch:
-                    not_tried_subpatches.append(subpatch_name)
-                    continue
+                # if not try_all_subpatches and skip_current_patch:
+                #     not_tried_subpatches.append(subpatch_name)
+                #     continue
 
                 # Try applying the subpatch as normal
-                subpatch_run_success = patch.Apply(fileName)
+                subpatch_run_success = patch.canApply(fileName)
                 if subpatch_run_success:
-                    successful_subpatches.append(subpatch_name)
+                    successful_subpatches.append([patch, subpatch_name])
                 else:
                     context_change_obj = cc.context_changes(patch)
                     diff_obj = context_change_obj.diff_obj
@@ -100,7 +106,7 @@ def apply(pathToPatch):
 
                         # Exact Patch Has Already Been Applied
                         if len(diff_obj.context_diffs) == 0 and len(diff_obj.added_diffs) == 0 and len(diff_obj.removed_diffs) == 0 and len(diff_obj.additional_lines) == 0:
-                            successful_subpatches.append(subpatch_name)
+                            successful_subpatches.append([patch, subpatch_name])
 
                         # No lines between the context lines other than parts of the patch (currently only case where we can apply patches)
                         elif len(diff_obj.additional_lines) == 0: 
@@ -140,29 +146,48 @@ def apply(pathToPatch):
 
                                 old_patch_lines = patch._lines
                                 patch._lines = new_patch_lines
-                                if patch.Apply(fileName):
-                                    successful_subpatches.append(subpatch_name)
+                                if patch.canApply(fileName):
+                                    successful_subpatches.append([patch, subpatch_name])
                                 else:
-                                    print("Issue with current assumption in terms of what patches can be applied")
-                                    print(subpatch_name)
-                                    print("\nContents of the patch-")
-                                    print(patch)
+                                    # print("Issue with current assumption in terms of what patches can be applied")
                                     failed_subpatches_with_matched_code.append((applied_percentage, subpatch_name, diff_obj.match_start_line))
-                                    print("----------------------------------------------------------------------")
+                                    
                         else:
                             failed_subpatches_with_matched_code.append((applied_percentage, subpatch_name, diff_obj.match_start_line))
 
                     else:
                         subpatches_without_matched_code.append(subpatch_name)
-
+    
+  
+        print("----------------------------------------------------------------------")
+        print("----------------------------------------------------------------------")
         if len(successful_subpatches) > 0:
-            print("\nSubpatches that applied successfully:")
-            print("\n".join(successful_subpatches))
-            print("----------------------------------------------------------------------")
-        
+            print("{} subpatches can be applied successfully:\n".format(len(successful_subpatches)))
+            start_apply= input("Would you like to see these patches and try applying them? [Y/n] ")
+            start_apply = (start_apply.upper() == "Y")
+            if(start_apply):
+                for patch in successful_subpatches:
+                    print(patch[1])
+                    print(patch[0])
+                    print("----------------------------------------------------------------------\n")
+                    apply_subpatch_input = input("The above subpatch can be applied successfully. Would you like to apply? [Y/n] ")
+                    apply_subpatch_input = (apply_subpatch_input.upper() == "Y")
+                    success = False
+                    if apply_subpatch_input:
+                        patchName = patch[1].split(":")[0]
+                        patchObj = patch[0]
+                        success = patchObj.Apply(patchName)
+                    if (success):
+                        print("Successfully applied!")
+                    else:
+                        print("Ignored")
+                    time.sleep(1)
+                    
+
+
         if len(failed_subpatches_with_matched_code) > 0:
             failed_subpatches_with_matched_code.sort()
-            print("\nHere are the subpatches that did not apply automatically, but we think we found where the patch should be applied\n")
+            print("Subpatches that we can't automatically apply, but think we have found where the patch should be applied-")
 
             for applied_percentage, sp_name, line_number in failed_subpatches_with_matched_code:
                 print("{} - Line Number: {} - Applied Percentage: {}%".format(sp_name, line_number, applied_percentage))
@@ -172,9 +197,9 @@ def apply(pathToPatch):
             print("Subpatches that did not apply, and we could not find where the patch should be applied:")
             print("\n".join(subpatches_without_matched_code))
             print("----------------------------------------------------------------------")
-        if len(not_tried_subpatches) > 0:
-            print("\nSubpatches that we did not try and apply:")
-            print("\n".join(not_tried_subpatches))
+        # if len(not_tried_subpatches) > 0:
+        #     print("\nSubpatches that we did not try and apply:")
+        #     print("\n".join(not_tried_subpatches))
 
         return 1
 
