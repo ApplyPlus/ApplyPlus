@@ -142,14 +142,17 @@ class Patch():
                         if original_patch_offset >= len(orgPatch):
                             patch_found_flag = False
                             break
-                        if self._lines[ite][0] == natureOfChange.ADDED:
-                            added_offset += 1
+                        if self._lines[ite][0] == natureOfChange.ADDED and orgPatch[original_patch_offset].strip():
+                            if orgPatch[original_patch_offset].strip() == self._lines[ite][1].strip():
+                                self._lines[ite] = (natureOfChange.CONTEXT, self._lines[ite][1])
+                            else:
+                                added_offset += 1
                         elif (orgPatch[original_patch_offset].strip() != self._lines[ite][1].strip()):
                             if len(orgPatch[original_patch_offset].strip()) == 0:
                                 blank_line_offset_file -= 1
                                 ite -= 1
                             elif len(self._lines[ite][1].strip()) == 0:
-                                blank_line_offset_file -= 1
+                                blank_line_offset_file += 1
                             else:
                                 patch_found_flag = False
                                 break

@@ -55,10 +55,11 @@ def apply(pathToPatch):
         # try_all_subpatches_input = input("Would you like to try and apply all subpatches? [Y/n] ")
         try_all_subpatches = True
         successful_subpatches = []
+        already_applied_subpatches = []
         failed_subpatches_with_matched_code = []
         subpatches_without_matched_code = []
         # not_tried_subpatches = []
-        see_patches = input("We have found {} subpatches in the patch file. Would you like to see them?[Y/n] ".format(len(patch_file.patches)))
+        see_patches = input("We have found {} subpatches in the patch file. Would you like to see them? [Y/n] ".format(len(patch_file.patches)))
         see_patches = (see_patches.upper() == "Y")
         for patch in patch_file.patches:
             fileName = patch._fileName[1:]
@@ -106,7 +107,7 @@ def apply(pathToPatch):
 
                         # Exact Patch Has Already Been Applied
                         if len(diff_obj.context_diffs) == 0 and len(diff_obj.added_diffs) == 0 and len(diff_obj.removed_diffs) == 0 and len(diff_obj.additional_lines) == 0:
-                            successful_subpatches.append([patch, subpatch_name])
+                            already_applied_subpatches.append(subpatch_name)
 
                         # No lines between the context lines other than parts of the patch (currently only case where we can apply patches)
                         elif len(diff_obj.additional_lines) == 0: 
@@ -174,25 +175,30 @@ def apply(pathToPatch):
                     apply_subpatch_input = (apply_subpatch_input.upper() == "Y")
                     success = False
                     if apply_subpatch_input:
-                        patchName = patch[1].split(":")[0]
+                        fileName = patch[0]._fileName[1:]
                         patchObj = patch[0]
-                        success = patchObj.Apply(patchName)
+                        success = patchObj.Apply(fileName)
                     if (success):
                         print("Successfully applied!")
                     else:
                         print("Ignored")
                     time.sleep(1)
+                    print("----------------------------------------------------------------------\n")
                     
-
-
         if len(failed_subpatches_with_matched_code) > 0:
             failed_subpatches_with_matched_code.sort()
-            print("Subpatches that we can't automatically apply, but think we have found where the patch should be applied-")
+            print("Subpatches that we can't automatically apply, but think we have found where the patch should be applied:")
 
             for applied_percentage, sp_name, line_number in failed_subpatches_with_matched_code:
                 print("{} - Line Number: {} - Applied Percentage: {}%".format(sp_name, line_number, applied_percentage))
-            print("Note that if a subpatch has an Applied Percentage of 100%, that means that the context may have changed in ways that affect the code")
+            print("\nNote that if a subpatch has an Applied Percentage of 100%, that means that the context may have changed in ways that affect the code")
             print("----------------------------------------------------------------------")
+
+        if len(already_applied_subpatches) > 0:
+            print("Subpatches that were already applied:")
+            print("\n".join(already_applied_subpatches))
+            print("----------------------------------------------------------------------")
+
         if len(subpatches_without_matched_code) > 0:
             print("Subpatches that did not apply, and we could not find where the patch should be applied:")
             print("\n".join(subpatches_without_matched_code))
