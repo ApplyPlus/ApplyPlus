@@ -11,8 +11,6 @@ def checkFileExistsElsewhere(patch):
 
     If it does, it warns the user that the file has moved.
     NOTE: This method assumes the patch has failed and we are looking for solutions
-
-    TODO: Attempt to apply the patch once a user has selected a file
     """
 
     toFind = patch.getFileName().split('/')[-1]
@@ -21,24 +19,26 @@ def checkFileExistsElsewhere(patch):
     for subdir, dirs, files in os.walk(currentdir):
         for file in files:
             if (file == toFind):
-                matched_file_locations.append(os.path.join(subdir, file))
+                matched_file_locations.append(os.path.relpath(os.path.join(subdir, file)))
+    
     
     if len(matched_file_locations) == 0:
-        print("A file with the filename could not be found in the current directory. Maybe the file has been deleted.")
+        return None
     else:
-        print("Here are the locations of files with the same filename as the missing file:")
+        print("----------------------------------------------------------------------")
+        print("Here are the locations of files with the same filename as the following missing file: {}".format(toFind))
         for i in range(len(matched_file_locations)):
             print("{} : {}".format(i, matched_file_locations[i]))
         
         to_apply_file_index = input("Select the file you would like to apply the patch to by entering the number next to it. Enter anything else to do nothing\n")
 
+        print("----------------------------------------------------------------------")
         try:
             to_apply_file_index = int(to_apply_file_index)
             if 0 <= to_apply_file_index and to_apply_file_index < len(matched_file_locations):
-                # TODO: Update this once we have methods to attempt to apply a subpatch
-                pass
+                return matched_file_locations[to_apply_file_index]
         except ValueError:
-            pass
+            return None
 
 # Testing
 # patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2014-8172.patch")
