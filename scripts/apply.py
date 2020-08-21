@@ -6,6 +6,7 @@ import test_match as tm
 import os
 import time
 import context_changes as cc
+import check_file_exists_elsewhere as check_exist
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -45,12 +46,11 @@ def apply(pathToPatch):
                 already_exists.add(split_line[1].strip())
             elif "No such file" in line:
                 file_not_found.add(split_line[1].strip())
-        
+            
         patch_file.getPatch()
         
         # TODO: Handle file that already exists
-        # TODO: Handle the not found files once functions to handle that have been merged
-
+        
         # Handling sub patches do not apply
         # try_all_subpatches_input = input("Would you like to try and apply all subpatches? [Y/n] ")
         try_all_subpatches = True
@@ -67,6 +67,13 @@ def apply(pathToPatch):
                 print(":".join([fileName, str(-patch._lineschanged[0])]))
                 print(patch)
                 print("----------------------------------------------------------------------")
+            if fileName in file_not_found:
+                correct_loc = check_exist.checkFileExistsElsewhere(patch)
+                if correct_loc != None:
+                    does_not_apply.add(correct_loc)
+                    file_not_found.remove(fileName)
+                    fileName = correct_loc
+                    patch._fileName = "/" + correct_loc
             if fileName in does_not_apply:
                 # [1:] is used to remove the leading slash
                 subpatch_name =  ":".join([fileName, str(-patch._lineschanged[0])])
@@ -202,6 +209,11 @@ def apply(pathToPatch):
         if len(subpatches_without_matched_code) > 0:
             print("Subpatches that did not apply, and we could not find where the patch should be applied:")
             print("\n".join(subpatches_without_matched_code))
+            print("----------------------------------------------------------------------")
+        
+        if len(file_not_found) > 0:
+            print("The following files could not be found:")
+            print("\n".join(file_not_found))
             print("----------------------------------------------------------------------")
         # if len(not_tried_subpatches) > 0:
         #     print("\nSubpatches that we did not try and apply:")
