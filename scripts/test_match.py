@@ -111,7 +111,6 @@ def calculate_language_diff(patch_line, file_line, file_name):
 # Returns line number of match location, returns -1 if no match
 def fuzzy_search(search_lines, file_name, patch_line_number, retry_obj=None):
     search_pattern = '\n'.join(search_lines) 
-
     file_lines = []
     cur_char = 0
     search_location = -1

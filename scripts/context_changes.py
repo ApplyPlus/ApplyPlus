@@ -49,7 +49,7 @@ def context_changes(sub_patch):
     diff_file_patch = match.find_diffs(
         sub_patch,
         file_path,
-        retry_obj=match.Retry(3, 100),
+        retry_obj=match.Retry(5, 100),
     )
 
     if diff_file_patch.match_status != match.Diff.MatchStatus.MATCH_FOUND:
