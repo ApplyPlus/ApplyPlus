@@ -1,18 +1,14 @@
-# How to run the tool
-
-At the moment, this is just a python script that takes args.
-
+## Installing required packages
 Requirments: Python3.6 and above
 
-To run the scripts run: 
-`python3 apply.py [--reverse] [--help] <path_to_patch> `
+`pip3 install -r requirements.txt`
 
-`path_to_patch` is required and is the path to the patch you are applying
+## Installing SRCML
+https://www.srcml.org/#download
 
-`--help` will list available subcommands and some
-concept guides
+After the installation completes, ensure that `srcml` can be run from the terminal. If 
+the `Command Not Found` error arrises, follow the instructions highlighted in this document
+https://osxdaily.com/2018/05/24/command-not-found-mac-terminal-error-fix/.
 
-`--reverse` will run `git apply --reverse`
-
-
-
+## Installing SRCSLICE
+A binary for MacOS/Ubuntu devices is provided in this project under the `patch_context/srcSliceBuilds` folder. 

@@ -1,16 +1,9 @@
 from enum import Enum
 import re
 import subprocess
+from scripts.enums import natureOfChange
 
-
-class natureOfChange(Enum):
-    ADDED = 1
-    REMOVED = -1
-    CONTEXT = 0
-
-
-class Patch():
-
+class Patch:
     def __init__(self, filename):
         """
         Constructor
@@ -24,7 +17,7 @@ class Patch():
         """
         self._fileName = filename
         self._lines = []
-        self._lineschanged = [-1,-1,-1,-1]
+        self._lineschanged = [-1, -1, -1, -1]
 
     def __str__(self):
         """
@@ -83,32 +76,48 @@ class Patch():
     def _to_raw(self, string):
         """ Private helper method to return raw string"""
         return fr"{string}"
+
     def canApply(self, applyTo):
         """
         Returns True if this patch can be applied, false otherwise
         """
         orgPatch = open(applyTo).readlines()
-        orgPatch = [s.strip("\n").encode(
-            'ascii', "ignore").decode('unicode_escape', "ignore") for s in orgPatch]
+        orgPatch = [
+            s.strip("\n").encode("ascii", "ignore").decode("unicode_escape", "ignore")
+            for s in orgPatch
+        ]
         for checkLines in range(len(orgPatch)):
             # Check if first line of patch exists
-            if (orgPatch[checkLines].strip() == self._to_raw(self._lines[1][1]).strip()):
+            if orgPatch[checkLines].strip() == self._to_raw(self._lines[1][1]).strip():
                 patch_found_flag = True
                 blank_line_offset_file = 0
                 added_offset = 0
                 ite = 2
                 while ite < len(self._lines):
-                    original_patch_offset = checkLines + ite-1-blank_line_offset_file - added_offset
+                    original_patch_offset = (
+                        checkLines + ite - 1 - blank_line_offset_file - added_offset
+                    )
                     if original_patch_offset >= len(orgPatch):
                         patch_found_flag = False
                         break
-                    if self._lines[ite][0] == natureOfChange.ADDED and orgPatch[original_patch_offset].strip():
-                        if orgPatch[original_patch_offset].strip() == self._lines[ite][1].strip():
-                            pass
-                            # self._lines[ite] = (natureOfChange.CONTEXT, self._lines[ite][1])
+                    if (
+                        self._lines[ite][0] == natureOfChange.ADDED
+                        and orgPatch[original_patch_offset].strip()
+                    ):
+                        if (
+                            orgPatch[original_patch_offset].strip()
+                            == self._lines[ite][1].strip()
+                        ):
+                            self._lines[ite] = (
+                                natureOfChange.CONTEXT,
+                                self._lines[ite][1],
+                            )
                         else:
                             added_offset += 1
-                    elif (orgPatch[original_patch_offset].strip() != self._lines[ite][1].strip()):
+                    elif (
+                        orgPatch[original_patch_offset].strip()
+                        != self._lines[ite][1].strip()
+                    ):
                         if len(orgPatch[original_patch_offset].strip()) == 0:
                             blank_line_offset_file -= 1
                             ite -= 1
@@ -129,26 +138,47 @@ class Patch():
         """
         if self.canApply(applyTo):
             orgPatch = open(applyTo).readlines()
-            orgPatch = [s.strip("\n").encode(
-                'ascii', "ignore").decode('unicode_escape', "ignore") for s in orgPatch]
+            orgPatch = [
+                s.strip("\n")
+                .encode("ascii", "ignore")
+                .decode("unicode_escape", "ignore")
+                for s in orgPatch
+            ]
             for checkLines in range(len(orgPatch)):
                 # Check if first line of patch exists
-                if (orgPatch[checkLines].strip() == self._to_raw(self._lines[1][1]).strip()):
+                if (
+                    orgPatch[checkLines].strip()
+                    == self._to_raw(self._lines[1][1]).strip()
+                ):
                     patch_found_flag = True
                     blank_line_offset_file = 0
                     added_offset = 0
                     ite = 2
                     while ite < len(self._lines):
-                        original_patch_offset = checkLines + ite-1-blank_line_offset_file - added_offset
+                        original_patch_offset = (
+                            checkLines + ite - 1 - blank_line_offset_file - added_offset
+                        )
                         if original_patch_offset >= len(orgPatch):
                             patch_found_flag = False
                             break
-                        if self._lines[ite][0] == natureOfChange.ADDED and orgPatch[original_patch_offset].strip():
-                            if orgPatch[original_patch_offset].strip() == self._lines[ite][1].strip():
-                                self._lines[ite] = (natureOfChange.CONTEXT, self._lines[ite][1])
+                        if (
+                            self._lines[ite][0] == natureOfChange.ADDED
+                            and orgPatch[original_patch_offset].strip()
+                        ):
+                            if (
+                                orgPatch[original_patch_offset].strip()
+                                == self._lines[ite][1].strip()
+                            ):
+                                self._lines[ite] = (
+                                    natureOfChange.CONTEXT,
+                                    self._lines[ite][1],
+                                )
                             else:
                                 added_offset += 1
-                        elif (orgPatch[original_patch_offset].strip() != self._lines[ite][1].strip()):
+                        elif (
+                            orgPatch[original_patch_offset].strip()
+                            != self._lines[ite][1].strip()
+                        ):
                             if len(orgPatch[original_patch_offset].strip()) == 0:
                                 blank_line_offset_file -= 1
                                 ite -= 1
@@ -159,24 +189,26 @@ class Patch():
                                 break
                         ite += 1
                     if patch_found_flag:
-                        #If the next line runs, we know the patch is applied here
+                        # If the next line runs, we know the patch is applied here
                         ite2 = 0
                         ite3 = 1
                         goal = len(self._lines)
-                        while(ite2 < goal and ite3 < len(self._lines)):
+                        while ite2 < goal and ite3 < len(self._lines):
 
-                            if(self._lines[ite3][0] == natureOfChange.REMOVED):
+                            if self._lines[ite3][0] == natureOfChange.REMOVED:
                                 goal -= 1
-                                orgPatch.pop(checkLines+ite2)
+                                orgPatch.pop(checkLines + ite2)
                                 ite3 += 1
-                            elif(self._lines[ite3][0] == natureOfChange.ADDED):
-                                orgPatch.insert(
-                                    checkLines+ite2, self._lines[ite3][1])
+                            elif self._lines[ite3][0] == natureOfChange.ADDED:
+                                orgPatch.insert(checkLines + ite2, self._lines[ite3][1])
                                 ite2 += 1
                                 ite3 += 1
-                            elif(self._lines[ite3][0] == natureOfChange.CONTEXT):
-                                if (self._lines[ite3][1].strip() != orgPatch[checkLines+ite2].strip()):
-                                    if (len(self._lines[ite3][1].strip()) == 0):
+                            elif self._lines[ite3][0] == natureOfChange.CONTEXT:
+                                if (
+                                    self._lines[ite3][1].strip()
+                                    != orgPatch[checkLines + ite2].strip()
+                                ):
+                                    if len(self._lines[ite3][1].strip()) == 0:
                                         ite3 += 1
                                     else:
                                         ite2 += 1
@@ -185,16 +217,15 @@ class Patch():
                                     ite3 += 1
                         writeobj = open(applyTo, "w")
                         for i in orgPatch:
-                            i= i.replace('\n', '\\n')
-                            writeobj.write(i+"\n")
+                            i = i.replace("\n", "\\n")
+                            writeobj.write(i + "\n")
                         writeobj.close()
                         return True
 
         return False
-            
-        
 
-class PatchFile():
+
+class PatchFile:
     def __init__(self, pathToFile=""):
         """
         Constructor
@@ -215,11 +246,14 @@ class PatchFile():
 
         If revert=True arg is provided, git apply --reverse is run.
         """
-        if (reverse == True):
-            result = subprocess.run(["git", "apply", "--reverse", self.pathToFile], capture_output=True)
+        if reverse == True:
+            result = subprocess.run(
+                ["git", "apply", "--reverse", self.pathToFile], capture_output=True
+            )
         else:
             result = subprocess.run(
-                ["git", "apply", self.pathToFile], capture_output=True)
+                ["git", "apply", self.pathToFile], capture_output=True
+            )
         if result.returncode == 0:
             self.runSuccess = True
             self.runResult = "Patch ran successfully"
@@ -235,7 +269,7 @@ class PatchFile():
 
         fileObj = open(self.pathToFile)
         file = fileObj.read().rstrip()
-        file = file.split('\n')
+        file = file.split("\n")
 
         patchObj = Patch("temp")
 
@@ -243,21 +277,25 @@ class PatchFile():
             # print(line)
             # print("________________")
 
-            if line[0:3] == "+++" or \
-                    line[0:3] == "---" or \
-                    line[0:5] == "index" or \
-                    line == "\n":
+            if (
+                line[0:3] == "+++"
+                or line[0:3] == "---"
+                or line[0:5] == "index"
+                or line == "\n"
+            ):
                 pass
 
             elif line[0:10] == "diff --git":
 
-                if patchObj.getFileName() != 'temp':  # To avoid pushing an empty list in 1st iteration
+                if (
+                    patchObj.getFileName() != "temp"
+                ):  # To avoid pushing an empty list in 1st iteration
                     self.patches.append(patchObj)
                 filename = line[11:].split()[0][1:]
                 patchObj = Patch(filename)
 
-            elif line[0:2] == '@@':
-                contextline = line[2:].split(' @@ ')[-1]
+            elif line[0:2] == "@@":
+                contextline = line[2:].split(" @@ ")[-1]
                 if len(patchObj.getLines()) != 0:
                     filename = patchObj.getFileName()
                     self.patches.append(patchObj)
@@ -266,7 +304,9 @@ class PatchFile():
                 else:
                     patchObj.setLinesChanged(line)
 
-                patchObj.addLines(natureOfChange.CONTEXT, contextline, )
+                patchObj.addLines(
+                    natureOfChange.CONTEXT, contextline,
+                )
 
             elif line[0] == "-":
                 contextline = line[1:]
@@ -280,5 +320,4 @@ class PatchFile():
                 patchObj.addLines(natureOfChange.CONTEXT, line)
 
         self.patches.append(patchObj)
-
 
