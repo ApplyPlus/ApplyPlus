@@ -110,7 +110,10 @@ def apply(pathToPatch):
                             elif line[0] == parse.natureOfChange.REMOVED:
                                 removed_line_count += 1
 
-                        applied_percentage = 100 - (len(diff_obj.added_diffs) + len(diff_obj.removed_diffs))/(added_line_count+removed_line_count)*100
+                        if added_line_count == 0 and removed_line_count == 0:
+                            applied_percentage = 100
+                        else:
+                            applied_percentage = 100 - (len(diff_obj.added_diffs) + len(diff_obj.removed_diffs))/(added_line_count+removed_line_count)*100
 
                         # Exact Patch Has Already Been Applied
                         if len(diff_obj.context_diffs) == 0 and len(diff_obj.added_diffs) == 0 and len(diff_obj.removed_diffs) == 0 and len(diff_obj.additional_lines) == 0:

@@ -104,7 +104,8 @@ class Patch():
                         break
                     if self._lines[ite][0] == natureOfChange.ADDED and orgPatch[original_patch_offset].strip():
                         if orgPatch[original_patch_offset].strip() == self._lines[ite][1].strip():
-                            self._lines[ite] = (natureOfChange.CONTEXT, self._lines[ite][1])
+                            pass
+                            # self._lines[ite] = (natureOfChange.CONTEXT, self._lines[ite][1])
                         else:
                             added_offset += 1
                     elif (orgPatch[original_patch_offset].strip() != self._lines[ite][1].strip()):
