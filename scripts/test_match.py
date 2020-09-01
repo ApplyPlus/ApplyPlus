@@ -266,7 +266,11 @@ def find_diffs(patch_obj, file_name, retry_obj=None, match_distance=3000):
         parse.natureOfChange.CONTEXT : context_diffs
     }
 
-    added_lines = set([line[1].strip() for line in patch_lines])
+    added_lines = []
+    for line in patch_lines:
+        if line[0] == parse.natureOfChange.ADDED:
+            added_lines.append(line[1].strip())
+    added_lines = set(added_lines)
 
     matched_file_lines = set()
     for idx, patch_line in enumerate(patch_lines):

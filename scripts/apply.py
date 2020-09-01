@@ -22,6 +22,24 @@ def get_args():
 def apply_reverse(pathToPatch):
     print ("Apply in reverse called")
 
+def calculate_percentage (diff_lines, line_count, is_removed=False):
+    if line_count == 0:
+        percentage = 100
+    else:
+        difference_amount = 0
+        for line_diff_obj in diff_lines:
+            if is_removed:
+                difference_amount += line_diff_obj.match_ratio
+            else:
+                if line_diff_obj.is_missing:
+                    difference_amount += 1
+                else:
+                    difference_amount += (1-line_diff_obj.match_ratio)
+        
+        percentage = 100 * (1 - difference_amount/line_count)
+    
+    return percentage
+
 def apply(pathToPatch):
     patch_file = parse.PatchFile(pathToPatch)
     patch_file.runPatch()
@@ -58,6 +76,7 @@ def apply(pathToPatch):
         already_applied_subpatches = []
         failed_subpatches_with_matched_code = []
         subpatches_without_matched_code = []
+        applied_by_git_apply = []
         # not_tried_subpatches = []
         see_patches = input("We have found {} subpatches in the patch file. Would you like to see them? [Y/n] ".format(len(patch_file.patches)))
         see_patches = (see_patches.upper() == "Y")
@@ -74,7 +93,7 @@ def apply(pathToPatch):
                     file_not_found.remove(fileName)
                     fileName = correct_loc
                     patch._fileName = "/" + correct_loc
-            if fileName in does_not_apply:
+            elif fileName in does_not_apply:
                 # [1:] is used to remove the leading slash
                 subpatch_name =  ":".join([fileName, str(-patch._lineschanged[0])])
 
@@ -102,6 +121,7 @@ def apply(pathToPatch):
                     if diff_obj.match_status == tm.Diff.MatchStatus.MATCH_FOUND:
                         added_line_count = 0
                         removed_line_count = 0
+                        context_line_count = 0
                         patch_lines = patch.getLines()
 
                         for line in patch_lines:
@@ -109,11 +129,14 @@ def apply(pathToPatch):
                                 added_line_count += 1
                             elif line[0] == parse.natureOfChange.REMOVED:
                                 removed_line_count += 1
+                            else:
+                                context_line_count += 1
 
-                        if added_line_count == 0 and removed_line_count == 0:
-                            applied_percentage = 100
-                        else:
-                            applied_percentage = 100 - (len(diff_obj.added_diffs) + len(diff_obj.removed_diffs))/(added_line_count+removed_line_count)*100
+                        added_line_applied_percentage = calculate_percentage(diff_obj.added_diffs, added_line_count)
+                        removed_line_applied_percentage = calculate_percentage(diff_obj.removed_diffs, removed_line_count, is_removed=True)
+                        context_line_match_percentage = calculate_percentage(diff_obj.context_diffs, context_line_count)
+                        
+                        percentages = [added_line_applied_percentage, removed_line_applied_percentage, context_line_match_percentage]
 
                         # Exact Patch Has Already Been Applied
                         if len(diff_obj.context_diffs) == 0 and len(diff_obj.added_diffs) == 0 and len(diff_obj.removed_diffs) == 0 and len(diff_obj.additional_lines) == 0:
@@ -123,7 +146,7 @@ def apply(pathToPatch):
                         elif len(diff_obj.additional_lines) == 0: 
                             # We should not apply the patch, context changes affect the code
                             if context_decision == cc.CONTEXT_DECISION.DONT_RUN:
-                                failed_subpatches_with_matched_code.append((applied_percentage, subpatch_name, diff_obj.match_start_line))
+                                failed_subpatches_with_matched_code.append((percentages, subpatch_name, diff_obj.match_start_line))
                                 
                             # We try to apply the patch, context changes are not important
                             # The case below is only for cases where the context is the only thing that is changed or a line has been completely added or removed with no similar lines
@@ -161,13 +184,15 @@ def apply(pathToPatch):
                                     successful_subpatches.append([patch, subpatch_name])
                                 else:
                                     # print("Issue with current assumption in terms of what patches can be applied")
-                                    failed_subpatches_with_matched_code.append((applied_percentage, subpatch_name, diff_obj.match_start_line))
+                                    failed_subpatches_with_matched_code.append((percentages, subpatch_name, diff_obj.match_start_line))
                                     
                         else:
-                            failed_subpatches_with_matched_code.append((applied_percentage, subpatch_name, diff_obj.match_start_line))
+                            failed_subpatches_with_matched_code.append((percentages, subpatch_name, diff_obj.match_start_line))
 
                     else:
                         subpatches_without_matched_code.append(subpatch_name)
+            elif fileName not in already_exists:
+                applied_by_git_apply.append(subpatch_name)
     
   
         print("----------------------------------------------------------------------")
@@ -196,12 +221,22 @@ def apply(pathToPatch):
                     print("----------------------------------------------------------------------\n")
                     
         if len(failed_subpatches_with_matched_code) > 0:
-            failed_subpatches_with_matched_code.sort()
-            print("Subpatches that we can't automatically apply, but think we have found where the patch should be applied:")
+            # failed_subpatches_with_matched_code.sort()
+            print("Subpatches that we can't automatically apply, but think we have found where the patch should be applied:\n")
 
-            for applied_percentage, sp_name, line_number in failed_subpatches_with_matched_code:
-                print("{} - Line Number: {} - Applied Percentage: {}%".format(sp_name, line_number, applied_percentage))
-            print("\nNote that if a subpatch has an Applied Percentage of 100%, that means that the context may have changed in ways that affect the code")
+            for percentages, sp_name, line_number in failed_subpatches_with_matched_code:
+                add_percent, removed_percent, context_percent = percentages
+                print("{} - Line Number: {}".format(sp_name, line_number))
+                print("Percentage of Added Lines Applied: {}%".format(add_percent))
+                print("Percentage of Removed Lines Applied: {}%".format(removed_percent))
+                print("Percentage of Context Lines Found: {}%\n".format(context_percent))
+                
+            print("Note that if all added lines are added and removed lines are removed, that means that the context may have changed in ways that affect the code")
+            print("----------------------------------------------------------------------")
+
+        if len(applied_by_git_apply) > 0:
+            print("Subpatches that were applied by git apply:")
+            print("\n".join(applied_by_git_apply))
             print("----------------------------------------------------------------------")
 
         if len(already_applied_subpatches) > 0:
