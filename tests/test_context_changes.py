@@ -117,6 +117,105 @@ class TestContextChanges(unittest.TestCase):
         result = context.context_changes(patch_file.patches[0])
         self.assertFalse(result.status)
 
+    def test_patch_CVE_2013_7348(self):
+        patch_file = parse.PatchFile("/Users/yuvika/Desktop/vulnerable_patches/vulnerableforks/patches/CVE-2013-7348.patch")
+        patch_file.getPatch()
+
+        result = context.context_changes(patch_file.patches[0])
+        self.assertFalse(result.status)
+    
+    def test_patch_CVE_2015_8845(self):
+        patch_file = parse.PatchFile("/Users/yuvika/Desktop/vulnerable_patches/vulnerableforks/patches/CVE-2015-8845.patch")
+        patch_file.getPatch()
+
+        result = context.context_changes(patch_file.patches[0])
+        self.assertFalse(result.status)
+
+    def test_patch_CVE_2013_7281(self):
+        patch_file = parse.PatchFile("/Users/yuvika/Desktop/vulnerable_patches/vulnerableforks/patches/CVE-2013-7281.patch")
+        patch_file.getPatch()
+
+        # Patch has already been applied
+        result = context.context_changes(patch_file.patches[0])
+        self.assertTrue(result.status)
+
+        # No context changes
+        result = context.context_changes(patch_file.patches[1])
+        self.assertTrue(result.status)
+
+        # No context changes
+        result = context.context_changes(patch_file.patches[2])
+        self.assertTrue(result.status)
+
+        # Context has changed a little
+        result = context.context_changes(patch_file.patches[3])
+        self.assertTrue(result.status)
+
+        # Context has changed a little
+        result = context.context_changes(patch_file.patches[4])
+        self.assertTrue(result.status)
+
+        # Subpatch has been applied
+        result = context.context_changes(patch_file.patches[5])
+        self.assertTrue(result.status)
+
+        # Subpatch has been applied
+        result = context.context_changes(patch_file.patches[6])
+        self.assertTrue(result.status)
+        
+        # Subpatch has been applied
+        result = context.context_changes(patch_file.patches[7])
+        self.assertTrue(result.status)
+
+        # Subpatch has been applied
+        result = context.context_changes(patch_file.patches[8])
+        self.assertTrue(result.status)
+
+        # Subpatch has been applied
+        result = context.context_changes(patch_file.patches[9])
+        self.assertTrue(result.status)
+
+        result = context.context_changes(patch_file.patches[10])
+        self.assertTrue(result.status)
+
+        result = context.context_changes(patch_file.patches[11])
+        self.assertTrue(result.status)
+
+        result = context.context_changes(patch_file.patches[12])
+        self.assertTrue(result.status)
+
+        result = context.context_changes(patch_file.patches[13])
+        self.assertTrue(result.status)
+
+        result = context.context_changes(patch_file.patches[14])
+        self.assertTrue(result.status)
+
+        result = context.context_changes(patch_file.patches[15])
+        self.assertTrue(result.status)
+        
+        result = context.context_changes(patch_file.patches[16])
+        self.assertTrue(result.status)
+    
+    def test_patch_CVE_2014_8481(self):
+        # patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2014-8481.patch")
+        patch_file = parse.PatchFile("/Users/yuvika/Desktop/URA/vulnerableforks/patches/CVE-2014-8481.patch")
+        patch_file.getPatch()
+
+        # Look into why it fails
+        result = context.context_changes(patch_file.patches[0])
+        print(result.messages)
+        self.assertTrue(result.status)
+
+    def test_patch_CVE_2014_9710(self):
+        # patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2014-9710.patch")
+        patch_file = parse.PatchFile("/Users/yuvika/Desktop/URA/vulnerableforks/patches/CVE-2014-9710.patch")
+        patch_file.getPatch()
+
+        # Subpatch has been applied - look into why it fails
+        result = context.context_changes(patch_file.patches[0])
+        print(result.messages)
+        self.assertTrue(result.status)
+
 
 if __name__ == "__main__":
     unittest.main()
