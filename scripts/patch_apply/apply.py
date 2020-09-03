@@ -12,7 +12,7 @@ import os
 import time
 import scripts.patch_context.context_changes as cc
 import check_file_exists_elsewhere as check_exist
-from scripts.enums import MatchStatus
+from scripts.enums import MatchStatus, natureOfChange, CONTEXT_DECISION
 
 
 def get_args():
@@ -52,6 +52,121 @@ def calculate_percentage(diff_lines, line_count, is_removed=False):
         percentage = 100 * (1 - difference_amount / line_count)
 
     return percentage
+
+
+def match_found_helper(
+    patch,
+    diff_obj,
+    already_applied_subpatches,
+    failed_subpatches_with_matched_code,
+    subpatch_name,
+):
+    added_line_count = 0
+    removed_line_count = 0
+    context_line_count = 0
+    patch_lines = patch.getLines()
+
+    for line in patch_lines:
+        if line[0] == natureOfChange.ADDED:
+            added_line_count += 1
+        elif line[0] == natureOfChange.REMOVED:
+            removed_line_count += 1
+        else:
+            context_line_count += 1
+
+    added_line_applied_percentage = calculate_percentage(
+        diff_obj.added_diffs, added_line_count
+    )
+    removed_line_applied_percentage = calculate_percentage(
+        diff_obj.removed_diffs, removed_line_count, is_removed=True
+    )
+    context_line_match_percentage = calculate_percentage(
+        diff_obj.context_diffs, context_line_count
+    )
+
+    percentages = [
+        added_line_applied_percentage,
+        removed_line_applied_percentage,
+        context_line_match_percentage,
+    ]
+
+    # Exact Patch Has Already Been Applied
+    if (
+        len(diff_obj.context_diffs) == 0
+        and len(diff_obj.added_diffs) == 0
+        and len(diff_obj.removed_diffs) == 0
+        and len(diff_obj.additional_lines) == 0
+    ):
+        already_applied_subpatches.append(subpatch_name)
+
+    # No lines between the context lines other than parts of the patch (currently only case where we can apply patches)
+    elif len(diff_obj.additional_lines) == 0:
+        # We should not apply the patch, context changes affect the code
+        if context_decision == CONTEXT_DECISION.DONT_RUN:
+            failed_subpatches_with_matched_code.append(
+                (percentages, subpatch_name, diff_obj.match_start_line,)
+            )
+
+        # We try to apply the patch, context changes are not important
+        # The case below is only for cases where the context is the only thing that is changed or a line has been completely added or removed with no similar lines
+        else:
+            new_patch_lines = [patch_lines[0]]
+            context_diff_index = 0
+            added_diff_index = 0
+            removed_diff_index = 0
+            for line in patch_lines[1:]:
+                if line[0] == natureOfChange.CONTEXT:
+                    if (
+                        context_diff_index < len(diff_obj.context_diffs)
+                        and diff_obj.context_diffs[
+                            context_diff_index
+                        ].patch_line.strip()
+                        == line[1].strip()
+                    ):
+                        if diff_obj.context_diffs[context_diff_index].is_missing:
+                            context_diff_index += 1
+                            continue
+                        new_context_line = diff_obj.context_diffs[
+                            context_diff_index
+                        ].file_line
+                        new_patch_lines.append(
+                            (natureOfChange.CONTEXT, new_context_line,)
+                        )
+                        context_diff_index += 1
+                    else:
+                        new_patch_lines.append(line)
+                elif line[0] == natureOfChange.ADDED:
+                    new_patch_lines.append(line)
+                    # if added_diff_index < len(diff_obj.added_diffs) and diff_obj.added_diffs[added_diff_index].patch_line.strip() == line[1].strip():
+                    #     new_patch_lines.append(line)
+                    #     added_diff_index += 1
+                    # else:
+                    #     new_patch_lines.append((parse.natureOfChange.CONTEXT, line[1]))
+                elif line[0] == natureOfChange.REMOVED:
+                    if (
+                        removed_diff_index < len(diff_obj.removed_diffs)
+                        and diff_obj.removed_diffs[
+                            removed_diff_index
+                        ].patch_line.strip()
+                        == line[1].strip()
+                    ):
+                        new_patch_lines.append(line)
+                        removed_diff_index += 1
+
+            old_patch_lines = patch._lines
+            patch._lines = new_patch_lines
+            if patch.canApply(fileName):
+                successful_subpatches.append([patch, subpatch_name])
+            else:
+                # print("Issue with current assumption in terms of what patches can be applied")
+                failed_subpatches_with_matched_code.append(
+                    (percentages, subpatch_name, diff_obj.match_start_line,)
+                )
+
+    else:
+        failed_subpatches_with_matched_code.append(
+            (percentages, subpatch_name, diff_obj.match_start_line)
+        )
 
 
 def apply(pathToPatch):
@@ -139,130 +254,38 @@ def apply(pathToPatch):
                     context_decision_msg = context_change_obj.messages
 
                     if diff_obj.match_status == MatchStatus.MATCH_FOUND:
-                        added_line_count = 0
-                        removed_line_count = 0
-                        context_line_count = 0
-                        patch_lines = patch.getLines()
-
-                        for line in patch_lines:
-                            if line[0] == parse.natureOfChange.ADDED:
-                                added_line_count += 1
-                            elif line[0] == parse.natureOfChange.REMOVED:
-                                removed_line_count += 1
-                            else:
-                                context_line_count += 1
-
-                        added_line_applied_percentage = calculate_percentage(
-                            diff_obj.added_diffs, added_line_count
+                        match_found_helper(
+                            patch,
+                            diff_obj,
+                            already_applied_subpatches,
+                            failed_subpatches_with_matched_code,
+                            subpatch_name,
                         )
-                        removed_line_applied_percentage = calculate_percentage(
-                            diff_obj.removed_diffs, removed_line_count, is_removed=True
-                        )
-                        context_line_match_percentage = calculate_percentage(
-                            diff_obj.context_diffs, context_line_count
-                        )
-
-                        percentages = [
-                            added_line_applied_percentage,
-                            removed_line_applied_percentage,
-                            context_line_match_percentage,
-                        ]
-
-                        # Exact Patch Has Already Been Applied
-                        if (
-                            len(diff_obj.context_diffs) == 0
-                            and len(diff_obj.added_diffs) == 0
-                            and len(diff_obj.removed_diffs) == 0
-                            and len(diff_obj.additional_lines) == 0
-                        ):
-                            already_applied_subpatches.append(subpatch_name)
-
-                        # No lines between the context lines other than parts of the patch (currently only case where we can apply patches)
-                        elif len(diff_obj.additional_lines) == 0:
-                            # We should not apply the patch, context changes affect the code
-                            if context_decision == cc.CONTEXT_DECISION.DONT_RUN:
-                                failed_subpatches_with_matched_code.append(
-                                    (
-                                        percentages,
-                                        subpatch_name,
-                                        diff_obj.match_start_line,
-                                    )
-                                )
-
-                            # We try to apply the patch, context changes are not important
-                            # The case below is only for cases where the context is the only thing that is changed or a line has been completely added or removed with no similar lines
-                            else:
-                                new_patch_lines = [patch_lines[0]]
-                                context_diff_index = 0
-                                added_diff_index = 0
-                                removed_diff_index = 0
-                                for line in patch_lines[1:]:
-                                    if line[0] == parse.natureOfChange.CONTEXT:
-                                        if (
-                                            context_diff_index
-                                            < len(diff_obj.context_diffs)
-                                            and diff_obj.context_diffs[
-                                                context_diff_index
-                                            ].patch_line.strip()
-                                            == line[1].strip()
-                                        ):
-                                            if diff_obj.context_diffs[
-                                                context_diff_index
-                                            ].is_missing:
-                                                context_diff_index += 1
-                                                continue
-                                            new_context_line = diff_obj.context_diffs[
-                                                context_diff_index
-                                            ].file_line
-                                            new_patch_lines.append(
-                                                (
-                                                    parse.natureOfChange.CONTEXT,
-                                                    new_context_line,
-                                                )
-                                            )
-                                            context_diff_index += 1
-                                        else:
-                                            new_patch_lines.append(line)
-                                    elif line[0] == parse.natureOfChange.ADDED:
-                                        new_patch_lines.append(line)
-                                        # if added_diff_index < len(diff_obj.added_diffs) and diff_obj.added_diffs[added_diff_index].patch_line.strip() == line[1].strip():
-                                        #     new_patch_lines.append(line)
-                                        #     added_diff_index += 1
-                                        # else:
-                                        #     new_patch_lines.append((parse.natureOfChange.CONTEXT, line[1]))
-                                    elif line[0] == parse.natureOfChange.REMOVED:
-                                        if (
-                                            removed_diff_index
-                                            < len(diff_obj.removed_diffs)
-                                            and diff_obj.removed_diffs[
-                                                removed_diff_index
-                                            ].patch_line.strip()
-                                            == line[1].strip()
-                                        ):
-                                            new_patch_lines.append(line)
-                                            removed_diff_index += 1
-
-                                old_patch_lines = patch._lines
-                                patch._lines = new_patch_lines
-                                if patch.canApply(fileName):
-                                    successful_subpatches.append([patch, subpatch_name])
-                                else:
-                                    # print("Issue with current assumption in terms of what patches can be applied")
-                                    failed_subpatches_with_matched_code.append(
-                                        (
-                                            percentages,
-                                            subpatch_name,
-                                            diff_obj.match_start_line,
-                                        )
-                                    )
-
-                        else:
-                            failed_subpatches_with_matched_code.append(
-                                (percentages, subpatch_name, diff_obj.match_start_line)
-                            )
 
                     else:
-                        subpatches_without_matched_code.append(subpatch_name)
+                        expand_search = input(
+                            f"We were unable to find a match for the subpatch {subpatch_name}, would you like us to expand the scope of our search? [Y/N]"
+                        )
+
+                        expand_search = expand_search.upper() == "Y"
+                        if expand_search:
+                            context_change_obj = cc.context_changes(patch, expand=True)
+                            diff_obj = context_change_obj.diff_obj
+                            context_decision = context_change_obj.status
+                            context_decision_msg = context_change_obj.messages
+
+                            if diff_obj.match_status == MatchStatus.MATCH_FOUND:
+                                match_found_helper(
+                                    patch,
+                                    diff_obj,
+                                    already_applied_subpatches,
+                                    failed_subpatches_with_matched_code,
+                                    subpatch_name,
+                                )
+                            else:
+                                subpatches_without_matched_code.append(subpatch_name)
+                        else:
+                            subpatches_without_matched_code.append(subpatch_name)
             elif fileName not in already_exists:
                 applied_by_git_apply.append(subpatch_name)
 
