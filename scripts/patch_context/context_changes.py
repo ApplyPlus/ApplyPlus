@@ -37,7 +37,8 @@ def context_changes(sub_patch, expand=False):
     file_name = sub_patch.getFileName()
 
     # TODO: update this to not be hardcoded
-    file_path = f"../msm-3.10{file_name}"
+    # file_path = f"../msm-3.10{file_name}"
+    file_path = f"/Users/yuvika/Desktop/UW_Research/msm-3.10{file_name}"
 
     file_slice = slice.SliceParser(file_path)
     file_slice_parsed = file_slice.slice_parse()

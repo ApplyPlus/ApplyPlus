@@ -21,7 +21,7 @@ class SliceParser:
 
             p = subprocess.Popen(
                 [  # change this to .../ubuntu/srcslice-ubuntu if needed
-                    "../vulnerableforks/scripts/patch_context/srcSliceBuilds/macOS/srcslice-mac",
+                    "/Users/yuvika/Desktop/URA/vulnerableforks/scripts/patch_context/srcSliceBuilds/macOS/srcslice-mac",
                     f"{path}",
                 ],
                 stdout=subprocess.PIPE,

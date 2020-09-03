@@ -18,7 +18,8 @@ class TestContextChanges(unittest.TestCase):
     """
 
     def test_patch_CVE_2014_8172(self):
-        patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2014-8172.patch")
+        # patch_file = parse.PatchFile("..vulnerableforks/patches/CVE-2014-8172.patch")
+        patch_file = parse.PatchFile("/Users/yuvika/Desktop/URA/vulnerableforks/patches/CVE-2014-8172.patch")
         patch_file.getPatch()
 
         result = context.context_changes(patch_file.patches[0])
@@ -56,7 +57,8 @@ class TestContextChanges(unittest.TestCase):
         self.assertFalse(result.status)
 
     def test_patch_CVE_2015_0572(self):
-        patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2014-8172.patch")
+        # patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2014-8172.patch")
+        patch_file = parse.PatchFile("/Users/yuvika/Desktop/URA/vulnerableforks/patches/CVE-2014-8172.patch")
         patch_file.getPatch()
 
         result = context.context_changes(patch_file.patches[0])
@@ -88,7 +90,8 @@ class TestContextChanges(unittest.TestCase):
         self.assertTrue(result.status)
 
     def test_patch_CVE_2012_2390(self):
-        patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2012-2390.patch")
+        # patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2012-2390.patch")
+        patch_file = parse.PatchFile("/Users/yuvika/Desktop/URA/vulnerableforks/patches/CVE-2012-2390.patch")
         patch_file.getPatch()
 
         result = context.context_changes(patch_file.patches[0])
@@ -107,7 +110,8 @@ class TestContextChanges(unittest.TestCase):
         self.assertTrue(result.status)
 
     def test_patch_CVE_2015_8845(self):
-        patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2015-8845.patch")
+        # patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2015-8845.patch")
+        patch_file = parse.PatchFile("/Users/yuvika/Desktop/URA/vulnerableforks/patches/CVE-2015-8845.patch")
         patch_file.getPatch()
 
         result = context.context_changes(patch_file.patches[0])
