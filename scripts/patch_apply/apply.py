@@ -264,7 +264,7 @@ def apply(pathToPatch):
 
                     else:
                         expand_search = input(
-                            f"We were unable to find a match for the subpatch {subpatch_name}, would you like us to expand the scope of our search? [Y/N]"
+                            f"We were unable to find a match for the subpatch \"{subpatch_name}\", would you like us to expand the scope of our search? [Y/n] "
                         )
 
                         expand_search = expand_search.upper() == "Y"
