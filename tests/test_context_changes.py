@@ -201,7 +201,7 @@ class TestContextChanges(unittest.TestCase):
         patch_file = parse.PatchFile("/Users/yuvika/Desktop/URA/vulnerableforks/patches/CVE-2014-8481.patch")
         patch_file.getPatch()
 
-        # Look into why it fails
+        # Look into why it fails!
         result = context.context_changes(patch_file.patches[0])
         print(result.messages)
         self.assertTrue(result.status)
@@ -211,9 +211,29 @@ class TestContextChanges(unittest.TestCase):
         patch_file = parse.PatchFile("/Users/yuvika/Desktop/URA/vulnerableforks/patches/CVE-2014-9710.patch")
         patch_file.getPatch()
 
-        # Subpatch has been applied - look into why it fails
+        # Subpatch has been applied - look into why it fails!
         result = context.context_changes(patch_file.patches[0])
         print(result.messages)
+        self.assertTrue(result.status)
+
+        # Subpatch has been applied
+        result = context.context_changes(patch_file.patches[1])
+        self.assertTrue(result.status)
+
+        # Subpatch has been applied
+        result = context.context_changes(patch_file.patches[2])
+        self.assertTrue(result.status)
+
+        # Subpatch has been applied
+        result = context.context_changes(patch_file.patches[3])
+        self.assertTrue(result.status)
+
+        # Subpatch has been applied
+        result = context.context_changes(patch_file.patches[4])
+        self.assertTrue(result.status)
+
+        # Subpatch has been applied
+        result = context.context_changes(patch_file.patches[5])
         self.assertTrue(result.status)
 
 
