@@ -47,11 +47,11 @@ def context_changes(sub_patch, expand=False):
     # (maybe do 3 runs while expanding scope)
     if expand:
         diff_file_patch = match.find_diffs(
-            sub_patch, file_path, retry_obj=match.Retry(20, 50),
+            sub_patch, file_path, retry_obj=match.Retry(1000, 50),
         )
     else:
         diff_file_patch = match.find_diffs(
-            sub_patch, file_path, retry_obj=match.Retry(5, 100),
+            sub_patch, file_path, retry_obj=match.Retry(5, 50),
         )
 
     if diff_file_patch.match_status != MatchStatus.MATCH_FOUND:

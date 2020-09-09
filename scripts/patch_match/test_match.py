@@ -176,6 +176,8 @@ def fuzzy_search(search_lines, file_name, patch_line_number, retry_obj=None):
                 if search_below_res != -1:
                     char_match_loc = search_below_res
                     break
+            if search_above_line not in line_to_char_dict and search_below_line not in line_to_char_dict:
+                break
 
     if char_match_loc != -1:
         return file_str[: char_match_loc + 1].count("\n") + 1

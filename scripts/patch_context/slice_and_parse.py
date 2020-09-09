@@ -1,4 +1,4 @@
-import os, subprocess
+import os, subprocess, sys
 import tempfile as tfile
 import re
 from enum import Enum
@@ -18,10 +18,15 @@ class SliceParser:
         try:
             with os.fdopen(fd, "w") as tmpo:
                 tmpo.write(str(out, "utf-8"))
+            
+            if sys.platform.startswith('darwin'):
+                src_slice_path = "../vulnerableforks/scripts/patch_context/srcSliceBuilds/macOS/srcslice-mac"
+            else:
+                src_slice_path = "../vulnerableforks/scripts/patch_context/srcSliceBuilds/ubuntu/srcslice-ubuntu"
 
             p = subprocess.Popen(
-                [  # change this to .../ubuntu/srcslice-ubuntu if needed
-                    "/Users/yuvika/Desktop/URA/vulnerableforks/scripts/patch_context/srcSliceBuilds/macOS/srcslice-mac",
+                [  
+                    src_slice_path,
                     f"{path}",
                 ],
                 stdout=subprocess.PIPE,
