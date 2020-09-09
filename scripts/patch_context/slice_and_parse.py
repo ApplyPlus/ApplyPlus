@@ -14,18 +14,21 @@ class SliceParser:
         )
         out, err = p.communicate()
 
+        if err:
+            return None
+
         fd, path = tfile.mkstemp(suffix=".xml", prefix="temp")
         try:
             with os.fdopen(fd, "w") as tmpo:
                 tmpo.write(str(out, "utf-8"))
-            
-            if sys.platform.startswith('darwin'):
+
+            if sys.platform.startswith("darwin"):
                 src_slice_path = "../vulnerableforks/scripts/patch_context/srcSliceBuilds/macOS/srcslice-mac"
             else:
                 src_slice_path = "../vulnerableforks/scripts/patch_context/srcSliceBuilds/ubuntu/srcslice-ubuntu"
 
             p = subprocess.Popen(
-                [  
+                [
                     src_slice_path,
                     f"{path}",
                 ],
@@ -36,7 +39,6 @@ class SliceParser:
 
             str_out = out.decode("utf-8")
             slice_dict = {}
-
             for line in str_out.splitlines():
 
                 # TODO: observe issue that arrises for patch CVE-2014-9710
