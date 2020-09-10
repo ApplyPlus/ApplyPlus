@@ -24,37 +24,48 @@ class TestContextChanges(unittest.TestCase):
 
         result = context.context_changes(patch_file.patches[0])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[1])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[2])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[3])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[4])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[5])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[6])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[7])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[8])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[9])
-        print(result.messages)
+        # print(result.messages)
         self.assertFalse(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[10])
         self.assertFalse(result.status)
+        self.assertFalse(result.is_comment)
 
     def test_patch_CVE_2015_0572(self):
         # patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2014-8172.patch")
@@ -63,31 +74,40 @@ class TestContextChanges(unittest.TestCase):
 
         result = context.context_changes(patch_file.patches[0])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[1])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[2])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[3])
-        print(result.messages)
+        # print(result.messages)
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[4])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[5])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[6])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[7])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[8])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
     def test_patch_CVE_2012_2390(self):
         # patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2012-2390.patch")
@@ -96,18 +116,23 @@ class TestContextChanges(unittest.TestCase):
 
         result = context.context_changes(patch_file.patches[0])
         self.assertFalse(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[1])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[2])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[3])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[4])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
     def test_patch_CVE_2015_8845(self):
         # patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2015-8845.patch")
@@ -116,6 +141,7 @@ class TestContextChanges(unittest.TestCase):
 
         result = context.context_changes(patch_file.patches[0])
         self.assertFalse(result.status)
+        self.assertFalse(result.is_comment)
 
     def test_patch_CVE_2013_7348(self):
         patch_file = parse.PatchFile("/Users/yuvika/Desktop/vulnerable_patches/vulnerableforks/patches/CVE-2013-7348.patch")
@@ -123,6 +149,7 @@ class TestContextChanges(unittest.TestCase):
 
         result = context.context_changes(patch_file.patches[0])
         self.assertFalse(result.status)
+        self.assertFalse(result.is_comment)
 
     def test_patch_CVE_2013_7281(self):
         patch_file = parse.PatchFile("/Users/yuvika/Desktop/vulnerable_patches/vulnerableforks/patches/CVE-2013-7281.patch")
@@ -131,63 +158,80 @@ class TestContextChanges(unittest.TestCase):
         # Patch has already been applied
         result = context.context_changes(patch_file.patches[0])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         # No context changes
         result = context.context_changes(patch_file.patches[1])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         # No context changes
         result = context.context_changes(patch_file.patches[2])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         # Context has changed a little
         result = context.context_changes(patch_file.patches[3])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         # Context has changed a little
         result = context.context_changes(patch_file.patches[4])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         # Subpatch has been applied
         result = context.context_changes(patch_file.patches[5])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         # Subpatch has been applied
         result = context.context_changes(patch_file.patches[6])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
         
         # Subpatch has been applied
         result = context.context_changes(patch_file.patches[7])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         # Subpatch has been applied
         result = context.context_changes(patch_file.patches[8])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         # Subpatch has been applied
         result = context.context_changes(patch_file.patches[9])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[10])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[11])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[12])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[13])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[14])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[15])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
         
         result = context.context_changes(patch_file.patches[16])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
     
     def test_patch_CVE_2014_8481(self):
         # patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2014-8481.patch")
@@ -198,6 +242,7 @@ class TestContextChanges(unittest.TestCase):
         result = context.context_changes(patch_file.patches[0])
         print(result.messages)
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
     def test_patch_CVE_2014_9710(self):
         # patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2014-9710.patch")
@@ -208,34 +253,42 @@ class TestContextChanges(unittest.TestCase):
         result = context.context_changes(patch_file.patches[0])
         print(result.messages)
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         # Subpatch has been applied
         result = context.context_changes(patch_file.patches[1])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         # Subpatch has been applied
         result = context.context_changes(patch_file.patches[2])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         # Subpatch has been applied
         result = context.context_changes(patch_file.patches[3])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         # Subpatch has been applied
         result = context.context_changes(patch_file.patches[4])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         # Subpatch has been applied
         result = context.context_changes(patch_file.patches[5])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         # Subpatch has been applied
         result = context.context_changes(patch_file.patches[6])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         # Subpatch has been applied
         result = context.context_changes(patch_file.patches[7])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
     def test_patch_CVE_2014_9644(self):
         patch_file = parse.PatchFile("/Users/yuvika/Desktop/URA/vulnerableforks/patches/CVE-2014-9644.patch")
@@ -244,74 +297,92 @@ class TestContextChanges(unittest.TestCase):
         # Subpatch has been applied
         result = context.context_changes(patch_file.patches[0])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         # Subpatch has been applied
         result = context.context_changes(patch_file.patches[1])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         # Subpatch has been applied
         result = context.context_changes(patch_file.patches[2])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         # Subpatch has been applied
         result = context.context_changes(patch_file.patches[3])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         # Subpatch has been applied
         result = context.context_changes(patch_file.patches[4])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         # Subpatch has been applied
         result = context.context_changes(patch_file.patches[5])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         # Subpatch has been applied
         result = context.context_changes(patch_file.patches[5])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         # Subpatch has been applied
         result = context.context_changes(patch_file.patches[6])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         # Subpatch has been applied
         result = context.context_changes(patch_file.patches[7])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         # Subpatch has been applied
         result = context.context_changes(patch_file.patches[8])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         # Subpatch has been applied
         result = context.context_changes(patch_file.patches[9])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         # Subpatch has been applied
         result = context.context_changes(patch_file.patches[10])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
        # Subpatch has been applied
         result = context.context_changes(patch_file.patches[11])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
        # Subpatch has been applied
         result = context.context_changes(patch_file.patches[12])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
        # Subpatch has been applied
         result = context.context_changes(patch_file.patches[13])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
        # Subpatch has been applied
         result = context.context_changes(patch_file.patches[14])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
        # Subpatch has been applied
         result = context.context_changes(patch_file.patches[15])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
        # Subpatch has been applied
         result = context.context_changes(patch_file.patches[16])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
        # This file has been deleted.
        # result = context.context_changes(patch_file.patches[17])
@@ -320,26 +391,32 @@ class TestContextChanges(unittest.TestCase):
        # Subpatch has been applied
         result = context.context_changes(patch_file.patches[18])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
        # Subpatch has been applied
         result = context.context_changes(patch_file.patches[19])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
        # Subpatch has been applied
         result = context.context_changes(patch_file.patches[20])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
        # Subpatch has been applied
         result = context.context_changes(patch_file.patches[21])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
        # Subpatch has been applied
         result = context.context_changes(patch_file.patches[22])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
        # Subpatch has been applied
         result = context.context_changes(patch_file.patches[23])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
     def test_patch_CVE_2015_3212(self):
         # patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2014-8481.patch")
@@ -348,35 +425,47 @@ class TestContextChanges(unittest.TestCase):
 
         result = context.context_changes(patch_file.patches[0])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[1])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[2])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[3])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[4])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[5])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
-        # Look into why this is failing! 
+        # Function name was changed
         result = context.context_changes(patch_file.patches[6])
-        print(result.messages)
-        self.assertTrue(result.status)
+        # print(result.messages)
+        self.assertFalse(result.status)
+        self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[7])
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
-        result = context.context_changes(patch_file.patches[8])
+        # Something was probably added in the middle and the line scope changed. Try to expand the search.
+        result = context.context_changes(patch_file.patches[8], True)
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
-        result = context.context_changes(patch_file.patches[9])
+        # Something was probably added in the middle and the line scope changed. Try to expand the search.
+        result = context.context_changes(patch_file.patches[9], True)
         self.assertTrue(result.status)
+        self.assertFalse(result.is_comment)
 
 if __name__ == "__main__":
     unittest.main()
