@@ -16,6 +16,9 @@ class ContextResult:
 
     message: Is a string that describes the output
         of the context related changes 
+
+    is_comment: Boolean that determines if the additional
+        lines are comments or not
     """
 
     def __init__(self, status, messages, diff_obj, is_comment):
@@ -38,8 +41,7 @@ def context_changes(sub_patch, expand=False):
     file_name = sub_patch.getFileName()
 
     # TODO: update this to not be hardcoded
-    # file_path = f"../msm-3.10{file_name}"
-    file_path = f"/Users/yuvika/Desktop/URA/msm-3.10{file_name}"
+    file_path = f"../msm-3.10{file_name}"
 
     file_slice = slice.SliceParser(file_path)
     file_slice_parsed = file_slice.slice_parse()
@@ -143,7 +145,6 @@ def context_changes(sub_patch, expand=False):
 
         context_diff_count += 1
 
-    
     if diff_file_patch.context_diffs:
         for add_lines in diff_file_patch.additional_lines:
             line_concat += add_lines
@@ -155,23 +156,10 @@ def context_changes(sub_patch, expand=False):
 
         # To match a multi-line comment.
         if re.search('\/\*(\*(?!\/)|[^*])*\*\/', line_concat):
-            comment_line &= True
+            comment_line = True
         else:
-            comment_line &= False
+            comment_line = False
     else:
         comment_line = False
         
     return ContextResult(apply_patch, output_message, diff_file_patch, comment_line)
-    
-    # return ContextResult(apply_patch, output_message, diff_file_patch)
-
-"""
-int y = 89; /* this is a comment */  - NO
-/* this is a comment */ - YES
-/* this is
- * still a comment ---- YES
-*/
- 
-// this is a comment - YES
-int y = 67; // this is a comment  - NO
-"""

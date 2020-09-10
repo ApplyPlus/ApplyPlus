@@ -18,8 +18,7 @@ class TestContextChanges(unittest.TestCase):
     """
 
     def test_patch_CVE_2014_8172(self):
-        # patch_file = parse.PatchFile("..vulnerableforks/patches/CVE-2014-8172.patch")
-        patch_file = parse.PatchFile("/Users/yuvika/Desktop/URA/vulnerableforks/patches/CVE-2014-8172.patch")
+        patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2014-8172.patch")
         patch_file.getPatch()
 
         result = context.context_changes(patch_file.patches[0])
@@ -68,16 +67,15 @@ class TestContextChanges(unittest.TestCase):
         self.assertFalse(result.is_comment)
 
     def test_patch_CVE_2015_0572(self):
-        # patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2014-8172.patch")
-        patch_file = parse.PatchFile("/Users/yuvika/Desktop/URA/vulnerableforks/patches/CVE-2014-8172.patch")
+        patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2015-0572.patch")
         patch_file.getPatch()
 
         result = context.context_changes(patch_file.patches[0])
-        self.assertTrue(result.status)
+        self.assertFalse(result.status)
         self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[1])
-        self.assertTrue(result.status)
+        self.assertFalse(result.status)
         self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[2])
@@ -110,8 +108,7 @@ class TestContextChanges(unittest.TestCase):
         self.assertFalse(result.is_comment)
 
     def test_patch_CVE_2012_2390(self):
-        # patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2012-2390.patch")
-        patch_file = parse.PatchFile("/Users/yuvika/Desktop/URA/vulnerableforks/patches/CVE-2012-2390.patch")
+        patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2012-2390.patch")
         patch_file.getPatch()
 
         result = context.context_changes(patch_file.patches[0])
@@ -135,8 +132,7 @@ class TestContextChanges(unittest.TestCase):
         self.assertFalse(result.is_comment)
 
     def test_patch_CVE_2015_8845(self):
-        # patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2015-8845.patch")
-        patch_file = parse.PatchFile("/Users/yuvika/Desktop/URA/vulnerableforks/patches/CVE-2015-8845.patch")
+        patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2015-8845.patch")
         patch_file.getPatch()
 
         result = context.context_changes(patch_file.patches[0])
@@ -144,7 +140,7 @@ class TestContextChanges(unittest.TestCase):
         self.assertFalse(result.is_comment)
 
     def test_patch_CVE_2013_7348(self):
-        patch_file = parse.PatchFile("/Users/yuvika/Desktop/vulnerable_patches/vulnerableforks/patches/CVE-2013-7348.patch")
+        patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2013-7348.patch")
         patch_file.getPatch()
 
         result = context.context_changes(patch_file.patches[0])
@@ -152,7 +148,7 @@ class TestContextChanges(unittest.TestCase):
         self.assertFalse(result.is_comment)
 
     def test_patch_CVE_2013_7281(self):
-        patch_file = parse.PatchFile("/Users/yuvika/Desktop/vulnerable_patches/vulnerableforks/patches/CVE-2013-7281.patch")
+        patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2013-7281.patch")
         patch_file.getPatch()
 
         # Patch has already been applied
@@ -234,8 +230,7 @@ class TestContextChanges(unittest.TestCase):
         self.assertFalse(result.is_comment)
     
     def test_patch_CVE_2014_8481(self):
-        # patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2014-8481.patch")
-        patch_file = parse.PatchFile("/Users/yuvika/Desktop/URA/vulnerableforks/patches/CVE-2014-8481.patch")
+        patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2014-8481.patch")
         patch_file.getPatch()
 
         # Look into why it fails!
@@ -245,8 +240,7 @@ class TestContextChanges(unittest.TestCase):
         self.assertFalse(result.is_comment)
 
     def test_patch_CVE_2014_9710(self):
-        # patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2014-9710.patch")
-        patch_file = parse.PatchFile("/Users/yuvika/Desktop/URA/vulnerableforks/patches/CVE-2014-9710.patch")
+        patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2014-9710.patch")
         patch_file.getPatch()
 
         # Subpatch has been applied - look into why it fails!
@@ -291,7 +285,7 @@ class TestContextChanges(unittest.TestCase):
         self.assertFalse(result.is_comment)
 
     def test_patch_CVE_2014_9644(self):
-        patch_file = parse.PatchFile("/Users/yuvika/Desktop/URA/vulnerableforks/patches/CVE-2014-9644.patch")
+        patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2014-9644.patch")
         patch_file.getPatch()
 
         # Subpatch has been applied
@@ -419,8 +413,7 @@ class TestContextChanges(unittest.TestCase):
         self.assertFalse(result.is_comment)
 
     def test_patch_CVE_2015_3212(self):
-        # patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2014-8481.patch")
-        patch_file = parse.PatchFile("/Users/yuvika/Desktop/URA/vulnerableforks/patches/CVE-2015-3212.patch")
+        patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2015-3212.patch")
         patch_file.getPatch()
 
         result = context.context_changes(patch_file.patches[0])
