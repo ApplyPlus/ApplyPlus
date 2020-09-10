@@ -11,7 +11,7 @@ class ContextResult:
     Context_Result stores the fields that determine
         whether the patch needs to be applied or not
 
-    run_patch: Boolean that determines if the patch 
+    run_patch: Boolean that determines if the patch
         should still be applied
 
     message: Is a string that describes the output
@@ -30,9 +30,9 @@ class ContextResult:
 
 def context_changes(sub_patch, expand=False):
     """
-    context_changes(str): takes in a sub-patch and 
-        returns a ContextResult object that determines 
-        whether to run the patch or not and an associate 
+    context_changes(str): takes in a sub-patch and
+        returns a ContextResult object that determines
+        whether to run the patch or not and an associate
         message that can be shown to users
 
     patch_file_path: string representing the path to a patch file
@@ -46,15 +46,26 @@ def context_changes(sub_patch, expand=False):
     file_slice = slice.SliceParser(file_path)
     file_slice_parsed = file_slice.slice_parse()
 
+    if not file_slice_parsed:
+        return ContextResult(
+            CONTEXT_DECISION.DONT_RUN.value,
+            "The extension of the file the patch refers to is not supported by srcML",
+            None,
+        )
+
     # TODO: find optimal retry object
     # (maybe do 3 runs while expanding scope)
     if expand:
         diff_file_patch = match.find_diffs(
-            sub_patch, file_path, retry_obj=match.Retry(1000, 50),
+            sub_patch,
+            file_path,
+            retry_obj=match.Retry(1000, 50),
         )
     else:
         diff_file_patch = match.find_diffs(
-            sub_patch, file_path, retry_obj=match.Retry(5, 50),
+            sub_patch,
+            file_path,
+            retry_obj=match.Retry(5, 50),
         )
 
     if diff_file_patch.match_status != MatchStatus.MATCH_FOUND:

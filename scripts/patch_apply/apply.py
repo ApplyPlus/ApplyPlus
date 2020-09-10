@@ -62,6 +62,7 @@ def match_found_helper(
     subpatch_name,
     context_decision,
     fileName,
+    successful_subpatches,
 ):
     added_line_count = 0
     removed_line_count = 0
@@ -106,7 +107,11 @@ def match_found_helper(
         # We should not apply the patch, context changes affect the code
         if context_decision == CONTEXT_DECISION.DONT_RUN:
             failed_subpatches_with_matched_code.append(
-                (percentages, subpatch_name, diff_obj.match_start_line,)
+                (
+                    percentages,
+                    subpatch_name,
+                    diff_obj.match_start_line,
+                )
             )
 
         # We try to apply the patch, context changes are not important
@@ -132,7 +137,10 @@ def match_found_helper(
                             context_diff_index
                         ].file_line
                         new_patch_lines.append(
-                            (natureOfChange.CONTEXT, new_context_line,)
+                            (
+                                natureOfChange.CONTEXT,
+                                new_context_line,
+                            )
                         )
                         context_diff_index += 1
                     else:
@@ -162,7 +170,11 @@ def match_found_helper(
             else:
                 # print("Issue with current assumption in terms of what patches can be applied")
                 failed_subpatches_with_matched_code.append(
-                    (percentages, subpatch_name, diff_obj.match_start_line,)
+                    (
+                        percentages,
+                        subpatch_name,
+                        diff_obj.match_start_line,
+                    )
                 )
 
     else:
@@ -265,6 +277,7 @@ def apply(pathToPatch):
                             subpatch_name,
                             context_decision,
                             fileName,
+                            successful_subpatches,
                         )
 
                     else:
@@ -381,6 +394,7 @@ def apply(pathToPatch):
                             subpatch_name,
                             context_decision,
                             fileName,
+                            successful_subpatches,
                         )
                     else:
                         post_expand_no_match_patches.append(subpatch_name)
