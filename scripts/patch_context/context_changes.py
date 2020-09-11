@@ -15,13 +15,17 @@ class ContextResult:
         should still be applied
 
     message: Is a string that describes the output
-        of the context related changes
+        of the context related changes 
+
+    is_comment: Boolean that determines if the additional
+        lines are comments or not
     """
 
-    def __init__(self, status, messages, diff_obj):
+    def __init__(self, status, messages, diff_obj, is_comment):
         self.status = status
         self.messages = messages
         self.diff_obj = diff_obj
+        self.is_comment = is_comment
 
 
 def context_changes(sub_patch, expand=False):
@@ -69,6 +73,7 @@ def context_changes(sub_patch, expand=False):
             CONTEXT_DECISION.DONT_RUN.value,
             "A context match was not found.",
             diff_file_patch,
+            False
         )
 
         return context_result
@@ -78,11 +83,14 @@ def context_changes(sub_patch, expand=False):
             CONTEXT_DECISION.RUN.value,
             "No context related issues found.",
             diff_file_patch,
+            False
         )
 
         return context_result
 
     apply_patch = True
+    comment_line = True
+    line_concat = ""
     output_message = ""
     context_diff_count = 1
 
@@ -148,4 +156,21 @@ def context_changes(sub_patch, expand=False):
 
         context_diff_count += 1
 
-    return ContextResult(apply_patch, output_message, diff_file_patch)
+    if diff_file_patch.context_diffs:
+        for add_lines in diff_file_patch.additional_lines:
+            line_concat += add_lines
+            # To match a single line comment.
+            if re.search('^[\/\/]+.*', add_lines):
+                comment_line &= True
+            else:
+                comment_line &= False
+
+        # To match a multi-line comment.
+        if re.search('\/\*(\*(?!\/)|[^*])*\*\/', line_concat):
+            comment_line = True
+        else:
+            comment_line = False
+    else:
+        comment_line = False
+        
+    return ContextResult(apply_patch, output_message, diff_file_patch, comment_line)
