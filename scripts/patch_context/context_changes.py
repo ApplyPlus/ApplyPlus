@@ -84,7 +84,7 @@ def context_changes(sub_patch, expand=False):
             CONTEXT_DECISION.RUN.value,
             "No context related issues found.",
             diff_file_patch,
-            False
+            False,
         )
 
         return context_result
