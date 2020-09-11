@@ -51,6 +51,7 @@ def context_changes(sub_patch, expand=False):
             CONTEXT_DECISION.DONT_RUN.value,
             "The extension of the file the patch refers to is not supported by srcML",
             None,
+            False,
         )
 
     # TODO: find optimal retry object
@@ -73,7 +74,7 @@ def context_changes(sub_patch, expand=False):
             CONTEXT_DECISION.DONT_RUN.value,
             "A context match was not found.",
             diff_file_patch,
-            False
+            False,
         )
 
         return context_result
@@ -83,7 +84,7 @@ def context_changes(sub_patch, expand=False):
             CONTEXT_DECISION.RUN.value,
             "No context related issues found.",
             diff_file_patch,
-            False
+            False,
         )
 
         return context_result
@@ -156,7 +157,7 @@ def context_changes(sub_patch, expand=False):
 
         context_diff_count += 1
 
-    if diff_file_patch.context_diffs:
+    if diff_file_patch.additional_lines:
         for add_lines in diff_file_patch.additional_lines:
             line_concat += add_lines
             # To match a single line comment.
