@@ -63,6 +63,7 @@ def match_found_helper(
     context_decision,
     fileName,
     successful_subpatches,
+    context_decision_msg,
 ):
     added_line_count = 0
     removed_line_count = 0
@@ -174,12 +175,18 @@ def match_found_helper(
                         percentages,
                         subpatch_name,
                         diff_obj.match_start_line,
+                        context_decision_msg,
                     )
                 )
 
     else:
         failed_subpatches_with_matched_code.append(
-            (percentages, subpatch_name, diff_obj.match_start_line)
+            (
+                percentages,
+                subpatch_name,
+                diff_obj.match_start_line,
+                context_decision_msg,
+            )
         )
 
 
@@ -278,6 +285,7 @@ def apply(pathToPatch):
                             context_decision,
                             fileName,
                             successful_subpatches,
+                            context_decision_msg,
                         )
 
                     else:
@@ -333,6 +341,7 @@ def apply(pathToPatch):
                 percentages,
                 sp_name,
                 line_number,
+                context_decision_msg,
             ) in failed_subpatches_with_matched_code:
                 add_percent, removed_percent, context_percent = percentages
                 print("{} - Line Number: {}".format(sp_name, line_number))
@@ -342,6 +351,9 @@ def apply(pathToPatch):
                 )
                 print(
                     "Percentage of Context Lines Found: {}%\n".format(context_percent)
+                )
+                print(
+                    f"Context related reason for not applying the patch: {context_decision_msg}\n"
                 )
 
             print(
