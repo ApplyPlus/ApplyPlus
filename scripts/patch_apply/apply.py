@@ -236,6 +236,7 @@ def apply(pathToPatch):
                 print(
                     "----------------------------------------------------------------------"
                 )
+            subpatch_name = ":".join([fileName, str(-patch._lineschanged[0])])
             if fileName in file_not_found:
                 correct_loc = check_exist.checkFileExistsElsewhere(patch)
                 if correct_loc != None:
@@ -245,7 +246,6 @@ def apply(pathToPatch):
                     patch._fileName = "/" + correct_loc
             elif fileName in does_not_apply:
                 # [1:] is used to remove the leading slash
-                subpatch_name = ":".join([fileName, str(-patch._lineschanged[0])])
 
                 # skip_current_patch = True
                 # if not try_all_subpatches:
