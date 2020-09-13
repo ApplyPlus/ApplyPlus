@@ -3,6 +3,7 @@ import re
 import subprocess
 from scripts.enums import natureOfChange
 
+
 class Patch:
     def __init__(self, filename):
         """
@@ -32,7 +33,7 @@ class Patch:
         return toReturn
 
     def addLines(self, lineType, lineToAdd):
-        """ 
+        """
         Method used to add a line to a patch file
         """
         self._lines.append((lineType, lineToAdd))
@@ -48,7 +49,7 @@ class Patch:
         return self._lines
 
     def getFileName(self):
-        """ 
+        """
         Accessor to get file name
         """
         return self._fileName
@@ -65,17 +66,17 @@ class Patch:
         return
 
     def getLinesChanged(self):
-        """ 
+        """
         Access the lines changed info for a patch
         return: A list of length 4.
-        Eg: For @@ -20,7 +20,6 @@, 
+        Eg: For @@ -20,7 +20,6 @@,
         this method returns [-20, 7, 20, 6]
         """
         return self._lineschanged
 
     def _to_raw(self, string):
         """ Private helper method to return raw string"""
-        return fr"{string}"
+        return str(string)
 
     def canApply(self, applyTo):
         """
@@ -134,7 +135,7 @@ class Patch:
     def Apply(self, applyTo):
         """
         If patch can be applied, this method
-        applies it. 
+        applies it.
         """
         if self.canApply(applyTo):
             orgPatch = open(applyTo).readlines()
@@ -240,8 +241,8 @@ class PatchFile:
         self.runResult = "Patch has not been run yet"
 
     def runPatch(self, reverse=False):
-        """ 
-        Returns an empty string if patch successfully runs 
+        """
+        Returns an empty string if patch successfully runs
         else returns the exact error message as a string
 
         If revert=True arg is provided, git apply --reverse is run.
@@ -264,7 +265,7 @@ class PatchFile:
         """
         A patch file has multiple patches.
         This method returns a list of patch objects
-        each representing one patch  
+        each representing one patch
         """
 
         fileObj = open(self.pathToFile)
@@ -305,7 +306,8 @@ class PatchFile:
                     patchObj.setLinesChanged(line)
 
                 patchObj.addLines(
-                    natureOfChange.CONTEXT, contextline,
+                    natureOfChange.CONTEXT,
+                    contextline,
                 )
 
             elif line[0] == "-":
@@ -320,4 +322,3 @@ class PatchFile:
                 patchObj.addLines(natureOfChange.CONTEXT, line)
 
         self.patches.append(patchObj)
-
