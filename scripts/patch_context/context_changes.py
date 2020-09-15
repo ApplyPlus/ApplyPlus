@@ -15,7 +15,7 @@ class ContextResult:
         should still be applied
 
     message: Is a string that describes the output
-        of the context related changes 
+        of the context related changes
 
     is_comment: Boolean that determines if the additional
         lines are comments or not
@@ -93,23 +93,21 @@ def context_changes(sub_patch, expand=False):
     comment_line = True
     line_concat = ""
     output_message = ""
-    context_diff_count = 1
 
     for context_diff in diff_file_patch.context_diffs:
         if context_diff.match_ratio < match.LEVENSHTEIN_RATIO:
             output_message += (
-                f"Context Diff #{context_diff_count}: The match ratio between the source and patch code was low. "
+                f"The match ratio between the source and patch code was low. "
                 f"We received a match ratio of {context_diff.match_ratio}, expected a ratio greater than or equal to {match.LEVENSHTEIN_RATIO}. "
                 f"The patch line was {context_diff.patch_line} whereas the file line was {context_diff.file_line}\n"
             )
 
             apply_patch &= CONTEXT_DECISION.DONT_RUN.value
-            context_diff_count += 1
             continue
 
-        elif re.search("^(\w+( )?){2,}\([^!@#$+%^]+?\)", context_diff.file_line):
+        elif re.search("(\w+( )?){2,}\([^!@#$+%^]+?\)", context_diff.file_line):
             output_message += (
-                f"Context Diff #{context_diff_count}: We noticed a context-related difference between the "
+                f"We noticed a context-related difference between the "
                 f"function in the source code [{context_diff.file_line}] We are suggesting to replace this function with [{context_diff.patch_line}]\n"
             )
 
@@ -117,7 +115,6 @@ def context_changes(sub_patch, expand=False):
             # TODO: should this be a false?
 
             apply_patch &= CONTEXT_DECISION.DONT_RUN.value
-            context_diff_count += 1
             continue
 
         diff_match = dmp_module.diff_match_patch()
@@ -125,15 +122,13 @@ def context_changes(sub_patch, expand=False):
             context_diff.file_line, context_diff.patch_line
         )
 
-        # TODO: verify if this line runs
-        if not line_patch_diffs:
-            apply_patch &= CONTEXT_DECISION.RUN.value
-
         # dissect the context line to determine type
         function_name = context_diff.function_for_patch
         for line_diff in line_patch_diffs:
             if line_diff[0] == 0 and line_diff[1].rstrip().endswith("="):
-                output_message += f"Context Diff #{context_diff_count}: An L-Value has been changed, we will not apply the patch.\n"
+                output_message += (
+                    f"An L-Value has been changed, we will not apply the patch.\n"
+                )
                 apply_patch &= CONTEXT_DECISION.DONT_RUN.value
                 break
 
@@ -143,35 +138,41 @@ def context_changes(sub_patch, expand=False):
                     file_var = [item for item in line_patch_diffs if item[0] == -1][0]
 
                     var_information = file_slice_parsed[function_name][file_var]
-                    output_message += f"Context Diff #{context_diff_count}: R-Value change, User should consider the following slicer_output: {var_information}"
+                    output_message += f"R-Value change, User should consider the following slicer_output: {var_information}"
                     apply_patch &= CONTEXT_DECISION.RUN.value
 
                 else:
                     output_message += (
-                        f"Context Diff #{context_diff_count}: R-Value change but function name was not "
+                        f"R-Value change but function name was not "
                         f"supplied by matching code, we can not provide slicer information\n"
                     )
                     apply_patch &= CONTEXT_DECISION.RUN.value
 
                 break
+            else:
+                output_message += (
+                    f"The context change was neither an L-Value, R-Value, or function name change; "
+                    "however, the match percentage was above the Leveinstein Ratio at {context_diff.match_ratio}"
+                )
+                apply_patch &= CONTEXT_DECISION.DONT_RUN.value
 
-        context_diff_count += 1
+                break
 
     if diff_file_patch.additional_lines:
         for add_lines in diff_file_patch.additional_lines:
             line_concat += add_lines
             # To match a single line comment.
-            if re.search('^[\/\/]+.*', add_lines):
+            if re.search("^[\/\/]+.*", add_lines):
                 comment_line &= True
             else:
                 comment_line &= False
 
         # To match a multi-line comment.
-        if re.search('\/\*(\*(?!\/)|[^*])*\*\/', line_concat):
+        if re.search("\/\*(\*(?!\/)|[^*])*\*\/", line_concat):
             comment_line = True
         else:
             comment_line = False
     else:
         comment_line = False
-        
+
     return ContextResult(apply_patch, output_message, diff_file_patch, comment_line)
