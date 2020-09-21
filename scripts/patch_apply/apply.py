@@ -407,7 +407,7 @@ def apply(pathToPatch):
                             context_decision,
                             fileName,
                             successful_subpatches,
-                            context_decision_msg,
+                            context_decision_msg
                         )
                     else:
                         post_expand_no_match_patches.append(subpatch_name)
@@ -417,6 +417,8 @@ def apply(pathToPatch):
                     "After expanding the scope of the search, these subpatches still did not apply:"
                 )
                 print("\n".join(post_expand_no_match_patches))
+            else:
+                print("The other subpatches were applied after expanding the scope of the search.")
 
             print(
                 "----------------------------------------------------------------------"
