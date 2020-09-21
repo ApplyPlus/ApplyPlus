@@ -119,8 +119,9 @@ def context_changes(sub_patch, expand=False):
         lhs_function_call_reg = re.search(
             "( +)(\w+( )?)\([^!@#$+%^]+?\)", context_diff.file_line
         )
+        print()
         function_definition_reg = re.search(
-            "\w+( )?){2,}\([^!@#$+%^]+?\)", context_diff.file_line
+            "(\w+( )?){2,}\([^!@#$+%^]+?\)", context_diff.file_line
         )
 
         if rhs_function_call_reg:
@@ -142,7 +143,7 @@ def context_changes(sub_patch, expand=False):
 
         # A function call is being made while not being assigned to a variable
         # we will continue with running the patch for this case
-        elif lhs_function_call_reg.group() == context_diff.file_line:
+        elif lhs_function_call_reg and lhs_function_call_reg.group() == context_diff.file_line:
             continue
 
         elif function_definition_reg:
@@ -215,7 +216,7 @@ def context_changes(sub_patch, expand=False):
                     except:
                         var_information = None
 
-                    # L-Value change on the RHS of expression
+                    # L-Value change on the RHS of exprsession
                     if var_information:
                         output_message = (
                             f"For the context line difference in the patch file {context_diff.patch_line}"
