@@ -119,9 +119,8 @@ def context_changes(sub_patch, expand=False):
         lhs_function_call_reg = re.search(
             "( +)(\w+( )?)\([^!@#$+%^]+?\)", context_diff.file_line
         )
-        print()
         function_definition_reg = re.search(
-            "(\w+( )?){2,}\([^!@#$+%^]+?\)", context_diff.file_line
+            "(\w+( )?){0,3}\([^!@#$+%^]+?\)", context_diff.file_line
         )
 
         if rhs_function_call_reg:
