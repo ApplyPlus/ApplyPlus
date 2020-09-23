@@ -54,20 +54,11 @@ def context_changes(sub_patch, expand=False):
             False,
         )
 
-    # TODO: find optimal retry object
-    # (maybe do 3 runs while expanding scope)
-    if expand:
-        diff_file_patch = match.find_diffs(
-            sub_patch,
-            file_path,
-            retry_obj=match.Retry(1000, 50),
-        )
-    else:
-        diff_file_patch = match.find_diffs(
-            sub_patch,
-            file_path,
-            retry_obj=match.Retry(5, 50),
-        )
+    diff_file_patch = match.find_diffs(
+        sub_patch,
+        file_path,
+        retry_obj=match.Retry(5, 50),
+    )
 
     if diff_file_patch.match_status != MatchStatus.MATCH_FOUND:
         context_result = ContextResult(
@@ -89,7 +80,6 @@ def context_changes(sub_patch, expand=False):
 
         return context_result
 
-    apply_patch = True
     comment_line = True
     line_concat = ""
     output_message = ""
