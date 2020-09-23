@@ -103,11 +103,12 @@ def context_changes(sub_patch, expand=False):
 
             return context_result
 
+        context_diff.file_line = ' '.join(context_diff.file_line.split())
         rhs_function_call_reg = re.search(
             "=( ?)(\w+( )?){2,}\([^!@#$+%^]+?\)", context_diff.file_line
         )
         lhs_function_call_reg = re.search(
-            "( +)(\w+( )?)\([^!@#$+%^]+?\)", context_diff.file_line
+            "( +)?(\w+( )?)\([^!@#$+%^]+?\);", context_diff.file_line
         )
         function_definition_reg = re.search(
             "(\w+( )?){0,3}\([^!@#$+%^]+?\)", context_diff.file_line
@@ -132,7 +133,11 @@ def context_changes(sub_patch, expand=False):
 
         # A function call is being made while not being assigned to a variable
         # we will continue with running the patch for this case
-        elif lhs_function_call_reg and lhs_function_call_reg.group() == context_diff.file_line:
+        if lhs_function_call_reg and lhs_function_call_reg.group() == context_diff.file_line:
+            continue
+        
+        # function call in return statement
+        elif function_definition_reg and "return" in context_diff.file_line:
             continue
 
         elif function_definition_reg:
@@ -159,6 +164,12 @@ def context_changes(sub_patch, expand=False):
         ]
 
         if not unchanged_diff_list:
+            # since the change is neither an L-Value, R-Value, fuction declaration, 
+            # or function call change, we will still continue to apply this patch
+            # since the match ratio was above the Levinstein Ratio
+            # TODO: Verifiy this is the intended behaviour
+            continue
+            '''
             output_message = (
                 f"For the context line difference in the patch file {context_diff.patch_line}"
                 f" and in the source file {context_diff.file_line} represents neither a function"
@@ -171,6 +182,7 @@ def context_changes(sub_patch, expand=False):
             )
 
             return context_result
+            '''
 
         else:
             unchanged_diff = unchanged_diff_list[0]
@@ -269,5 +281,5 @@ def context_changes(sub_patch, expand=False):
         comment_line = False
 
     return ContextResult(
-        True, "This Patch can be applied.", diff_file_patch, comment_line
+        CONTEXT_DECISION.RUN.value, "This Patch can be applied.", diff_file_patch, comment_line
     )
