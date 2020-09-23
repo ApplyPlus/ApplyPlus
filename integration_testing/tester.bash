@@ -8,7 +8,7 @@ for path in ../patches/*; do
     echo $path 
     echo $path >> ../vulnerableforks/integration_testing/result.txt
     echo "---------111--------------" >> ../vulnerableforks/integration_testing/result.txt
-    python3 ../vulnerableforks/scripts/apply.py ../vulnerableforks/integration_testing/$path >> ../vulnerableforks/integration_testing/result.txt
+    python3 ../vulnerableforks/scripts/patch_apply/apply.py ../vulnerableforks/integration_testing/$path >> ../vulnerableforks/integration_testing/result.txt
     git diff >> ../vulnerableforks/integration_testing/result.txt
     echo "*****-------------------*-*-*------------------------" >> ../vulnerableforks/integration_testing/result.txt
     echo "------------------------*-*-*------------------------" >> ../vulnerableforks/integration_testing/result.txt

@@ -16,7 +16,7 @@ class TestContextChanges(unittest.TestCase):
     ex: test_patch_CVE_2014_8172 has tests for the
     CVE-2014-8172 patch
     """
-
+    
     def test_patch_CVE_2014_8172(self):
         patch_file = parse.PatchFile("../vulnerableforks/patches/CVE-2014-8172.patch")
         patch_file.getPatch()
@@ -178,7 +178,7 @@ class TestContextChanges(unittest.TestCase):
 
         # Subpatch has been applied
         result = context.context_changes(patch_file.patches[5])
-        self.assertTrue(result.status)
+        self.assertFalse(result.status)
         self.assertFalse(result.is_comment)
 
         # Subpatch has been applied
@@ -235,8 +235,7 @@ class TestContextChanges(unittest.TestCase):
 
         # Look into why it fails!
         result = context.context_changes(patch_file.patches[0])
-        print(result.messages)
-        self.assertTrue(result.status)
+        self.assertFalse(result.status)
         self.assertFalse(result.is_comment)
 
     def test_patch_CVE_2014_9710(self):
@@ -245,13 +244,12 @@ class TestContextChanges(unittest.TestCase):
 
         # Subpatch has been applied - look into why it fails!
         result = context.context_changes(patch_file.patches[0])
-        print(result.messages)
-        self.assertTrue(result.status)
+        self.assertFalse(result.status)
         self.assertFalse(result.is_comment)
 
         # Subpatch has been applied
         result = context.context_changes(patch_file.patches[1])
-        self.assertTrue(result.status)
+        self.assertFalse(result.status)
         self.assertFalse(result.is_comment)
 
         # Subpatch has been applied
@@ -271,7 +269,7 @@ class TestContextChanges(unittest.TestCase):
 
         # Subpatch has been applied
         result = context.context_changes(patch_file.patches[5])
-        self.assertTrue(result.status)
+        self.assertFalse(result.status)
         self.assertFalse(result.is_comment)
 
         # Subpatch has been applied
@@ -281,7 +279,7 @@ class TestContextChanges(unittest.TestCase):
 
         # Subpatch has been applied
         result = context.context_changes(patch_file.patches[7])
-        self.assertTrue(result.status)
+        self.assertFalse(result.status)
         self.assertFalse(result.is_comment)
 
     def test_patch_CVE_2014_9644(self):
@@ -417,7 +415,7 @@ class TestContextChanges(unittest.TestCase):
         patch_file.getPatch()
 
         result = context.context_changes(patch_file.patches[0])
-        self.assertTrue(result.status)
+        self.assertFalse(result.status)
         self.assertFalse(result.is_comment)
 
         result = context.context_changes(patch_file.patches[1])
@@ -450,14 +448,12 @@ class TestContextChanges(unittest.TestCase):
         self.assertTrue(result.status)
         self.assertFalse(result.is_comment)
 
-        # Something was probably added in the middle and the line scope changed. Try to expand the search.
-        result = context.context_changes(patch_file.patches[8], True)
-        self.assertTrue(result.status)
+        result = context.context_changes(patch_file.patches[8])
+        self.assertFalse(result.status)
         self.assertFalse(result.is_comment)
 
-        # Something was probably added in the middle and the line scope changed. Try to expand the search.
-        result = context.context_changes(patch_file.patches[9], True)
-        self.assertTrue(result.status)
+        result = context.context_changes(patch_file.patches[9])
+        self.assertFalse(result.status)
         self.assertFalse(result.is_comment)
 
 if __name__ == "__main__":

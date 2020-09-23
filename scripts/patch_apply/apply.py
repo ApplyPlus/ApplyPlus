@@ -275,7 +275,7 @@ def apply(pathToPatch):
                     context_decision = context_change_obj.status
                     context_decision_msg = context_change_obj.messages
 
-                    if diff_obj.match_status == MatchStatus.MATCH_FOUND:
+                    if diff_obj and diff_obj.match_status == MatchStatus.MATCH_FOUND:
                         match_found_helper(
                             patch,
                             diff_obj,
@@ -382,41 +382,6 @@ def apply(pathToPatch):
                 "Subpatches that did not apply, and we could not find where the patch should be applied:"
             )
             print("\n".join(subpatches_without_matched_code))
-
-            expand_search = input(
-                "Would you like to expand the scope of the search on these subpatches? [Y/n]"
-            )
-
-            if expand_search:
-                for patch in no_match_patches:
-                    fileName = patch._fileName[1:]
-                    subpatch_name = ":".join([fileName, str(-patch._lineschanged[0])])
-                    post_expand_no_match_patches = []
-                    context_change_obj = cc.context_changes(patch, expand=True)
-                    diff_obj = context_change_obj.diff_obj
-                    context_decision = context_change_obj.status
-                    context_decision_msg = context_change_obj.messages
-
-                    if diff_obj.match_status == MatchStatus.MATCH_FOUND:
-                        match_found_helper(
-                            patch,
-                            diff_obj,
-                            already_applied_subpatches,
-                            failed_subpatches_with_matched_code,
-                            subpatch_name,
-                            context_decision,
-                            fileName,
-                            successful_subpatches,
-                            context_decision_msg,
-                        )
-                    else:
-                        post_expand_no_match_patches.append(subpatch_name)
-
-            if post_expand_no_match_patches:
-                print(
-                    "After expanding the scope of the search, these subpatches still did not apply:"
-                )
-                print("\n".join(post_expand_no_match_patches))
 
             print(
                 "----------------------------------------------------------------------"
