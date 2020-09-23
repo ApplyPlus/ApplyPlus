@@ -275,7 +275,7 @@ def apply(pathToPatch):
                     context_decision = context_change_obj.status
                     context_decision_msg = context_change_obj.messages
 
-                    if diff_obj.match_status == MatchStatus.MATCH_FOUND:
+                    if diff_obj and diff_obj.match_status == MatchStatus.MATCH_FOUND:
                         match_found_helper(
                             patch,
                             diff_obj,
@@ -397,7 +397,7 @@ def apply(pathToPatch):
                     context_decision = context_change_obj.status
                     context_decision_msg = context_change_obj.messages
 
-                    if diff_obj.match_status == MatchStatus.MATCH_FOUND:
+                    if diff_obj and diff_obj.match_status == MatchStatus.MATCH_FOUND:
                         match_found_helper(
                             patch,
                             diff_obj,
