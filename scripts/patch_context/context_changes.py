@@ -206,9 +206,6 @@ def context_changes(sub_patch, expand=False):
             elif unchanged_diff.rstrip().endswith("="):
                 # dissect the context line to determine type
                 function_name = context_diff.function_for_patch
-                potential_file_var = [
-                    item for item in line_patch_diffs if item[0] == -1
-                ][0]
 
                 if function_name:
                     function_name = function_name.split("(")[0].split()[-1]
@@ -237,6 +234,11 @@ def context_changes(sub_patch, expand=False):
                         # R-Value change we continue with running the patch
                         continue
                 else:
+                    potential_file_var = [item for item in line_patch_diffs if item[0] == -1]
+
+                    if potential_file_var:
+                        potential_file_var[0]
+
                     # we don't know the function name
                     is_var = False
                     for _, value in file_slice_parsed.items():
