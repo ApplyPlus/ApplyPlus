@@ -1,4 +1,0 @@
-diff_match_patch
-python-Levenshtein
-pygments
-argparse
