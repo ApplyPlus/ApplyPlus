@@ -1,4 +1,4 @@
-![logo](assets/logo.png)
+![logo](assets/logo_small.png)
 
 
 ## Running ApplyPlus from source
