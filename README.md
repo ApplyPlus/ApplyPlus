@@ -1,5 +1,12 @@
-## Running Apply Patch Script
-`python3 apply.py [--reverse] [--help] ../vulnerableforks/patches/<patch_file_name>`
+![logo](assets/logo.png)
+
+
+## Running ApplyPlus from source
+
+1. Install dependencies as described below
+2. From the root of this directory, run-
+
+`applyplus.py [-h] [--reverse] pathToPatch`
 
 `patch_file_name` is required and is the patch you are applying
 
@@ -7,9 +14,6 @@
 concept guides
 
 `--reverse` will run `git apply --reverse`
-
-## Running Tests
-`python3 ../vulnerableforks/tests/<test_file_name>`
 
 
 ## Installing required packages
@@ -31,3 +35,7 @@ https://osxdaily.com/2018/05/24/command-not-found-mac-terminal-error-fix/.
 
 ### SrcSclice
 A binary for MacOS/Ubuntu devices is provided in this project under the `patch_context/srcSliceBuilds` folder. 
+
+
+## Running Tests
+`python3 ../vulnerableforks/tests/<test_file_name>`
