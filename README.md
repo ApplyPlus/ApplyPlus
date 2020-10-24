@@ -1,14 +1,3 @@
-# vulnerableforks
-
-Link to Patch Classification Spreadsheet: https://docs.google.com/spreadsheets/d/1hCqyOZA-nplliI-bdGzt6IMTdFmO5hQp88RwCge0wcw/edit?usp=sharing
-
-Link to Patch Classification Write Up (Description and examples) - https://docs.google.com/document/d/134bmSlemKDy2chgjqK3wxQGC0PsluSVZDMMZgkTlp_Y/edit?usp=sharing
-
-## Expected directory structure:
-
-|- msm-3.10 (run scripts from within this directory)
-|- vulnerableforks
-
 ## Running Apply Patch Script
 `python3 apply.py [--reverse] [--help] ../vulnerableforks/patches/<patch_file_name>`
 
@@ -21,3 +10,24 @@ concept guides
 
 ## Running Tests
 `python3 ../vulnerableforks/tests/<test_file_name>`
+
+
+## Installing required packages
+Requirments: 
+
+1. Python3.6 (or above)
+1. SrcML
+1. SrcSlice
+1. Python Libraries from PyPI-
+
+`pip3 install -r src/requirements.txt` 
+
+### Installing SrcML
+https://www.srcml.org/#download
+
+After the installation completes, ensure that `srcml` can be run from the terminal. If 
+the `Command Not Found` error arrises, follow the instructions highlighted in this document
+https://osxdaily.com/2018/05/24/command-not-found-mac-terminal-error-fix/.
+
+### SrcSclice
+A binary for MacOS/Ubuntu devices is provided in this project under the `patch_context/srcSliceBuilds` folder. 
